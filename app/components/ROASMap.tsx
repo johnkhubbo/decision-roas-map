@@ -33,6 +33,9 @@ const ROASMap = () => {
   const [actUpsellUnits, setActUpsellUnits] = useState(0);
   const [actCashCollectionRate, setActCashCollectionRate] = useState(95);
 
+  // Toggle state for Predictions/Actuals
+  const [activeView, setActiveView] = useState<"predictions" | "actuals">("predictions");
+
   // Scenario Planner Sliders
   const [scenarioCTR, setScenarioCTR] = useState(2);
   const [scenarioRegConversion, setScenarioRegConversion] = useState(40);
@@ -188,13 +191,69 @@ const ROASMap = () => {
         
         {/* Predictions & Actuals Section */}
         <div style={{ marginBottom: "32px" }}>
+          {/* Toggle Control */}
           <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
-            gap: "24px"
+            display: "flex",
+            justifyContent: "center",
+            marginBottom: "24px"
           }}>
-            {/* Predictions Column */}
-            <CalculatorColumn
+            <div style={{
+              display: "inline-flex",
+              background: "#f6f6f6",
+              borderRadius: "12px",
+              padding: "4px",
+              gap: "4px"
+            }}>
+              <button
+                onClick={() => setActiveView("predictions")}
+                style={{
+                  padding: "12px 48px",
+                  fontSize: "16px",
+                  fontWeight: "700",
+                  border: "none",
+                  borderRadius: "10px",
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
+                  fontFamily: "inherit",
+                  background: activeView === "predictions" 
+                    ? "linear-gradient(135deg, #2bbfd5 0%, #9a17bb 100%)" 
+                    : "transparent",
+                  color: activeView === "predictions" ? "#ffffff" : "#666",
+                  boxShadow: activeView === "predictions" ? "0 2px 8px rgba(43, 191, 213, 0.3)" : "none"
+                }}
+              >
+                Predictions
+              </button>
+              <button
+                onClick={() => setActiveView("actuals")}
+                style={{
+                  padding: "12px 48px",
+                  fontSize: "16px",
+                  fontWeight: "700",
+                  border: "none",
+                  borderRadius: "10px",
+                  cursor: "pointer",
+                  transition: "all 0.3s ease",
+                  fontFamily: "inherit",
+                  background: activeView === "actuals" 
+                    ? "linear-gradient(135deg, #2bbfd5 0%, #9a17bb 100%)" 
+                    : "transparent",
+                  color: activeView === "actuals" ? "#ffffff" : "#666",
+                  boxShadow: activeView === "actuals" ? "0 2px 8px rgba(43, 191, 213, 0.3)" : "none"
+                }}
+              >
+                Actuals
+              </button>
+            </div>
+          </div>
+
+          {/* Single Column - Conditionally Rendered */}
+          <div style={{
+            maxWidth: "700px",
+            margin: "0 auto"
+          }}>
+            {activeView === "predictions" && (
+              <CalculatorColumn
               title="Predictions"
               subtitle="Fill in before campaign launch"
               metaSpend={predMetaSpend}
@@ -225,39 +284,41 @@ const ROASMap = () => {
               netRevenue={predicted.netRevenue}
               grossRevenue={predicted.grossRevenue}
             />
+            )}
 
-            {/* Actuals Column */}
-            <CalculatorColumn
-              title="Actuals"
-              subtitle="Fill in at 90 days from real data"
-              metaSpend={actMetaSpend}
-              setMetaSpend={setActMetaSpend}
-              youtubeSpend={actYouTubeSpend}
-              setYouTubeSpend={setActYouTubeSpend}
-              highTicketPrice={actHighTicketPrice}
-              setHighTicketPrice={setActHighTicketPrice}
-              midTicketPrice={actMidTicketPrice}
-              setMidTicketPrice={setActMidTicketPrice}
-              upsellPrice={actUpsellPrice}
-              setUpsellPrice={setActUpsellPrice}
-              highTicketSales={actHighTicketSales}
-              setHighTicketSales={setActHighTicketSales}
-              highTicketPaymentPlans={actHighTicketPaymentPlans}
-              setHighTicketPaymentPlans={setActHighTicketPaymentPlans}
-              midTicketSales={actMidTicketSales}
-              setMidTicketSales={setActMidTicketSales}
-              midTicketPaymentPlans={actMidTicketPaymentPlans}
-              setMidTicketPaymentPlans={setActMidTicketPaymentPlans}
-              upsellUnits={actUpsellUnits}
-              setUpsellUnits={setActUpsellUnits}
-              cashCollectionRate={actCashCollectionRate}
-              setCashCollectionRate={setActCashCollectionRate}
-              roas={actual.roas}
-              roasLabel="Actual ROAS"
-              totalAdSpend={actual.totalAdSpend}
-              netRevenue={actual.netRevenue}
-              grossRevenue={actual.grossRevenue}
-            />
+            {activeView === "actuals" && (
+              <CalculatorColumn
+                title="Actuals"
+                subtitle="Fill in at 90 days from real data"
+                metaSpend={actMetaSpend}
+                setMetaSpend={setActMetaSpend}
+                youtubeSpend={actYouTubeSpend}
+                setYouTubeSpend={setActYouTubeSpend}
+                highTicketPrice={actHighTicketPrice}
+                setHighTicketPrice={setActHighTicketPrice}
+                midTicketPrice={actMidTicketPrice}
+                setMidTicketPrice={setActMidTicketPrice}
+                upsellPrice={actUpsellPrice}
+                setUpsellPrice={setActUpsellPrice}
+                highTicketSales={actHighTicketSales}
+                setHighTicketSales={setActHighTicketSales}
+                highTicketPaymentPlans={actHighTicketPaymentPlans}
+                setHighTicketPaymentPlans={setActHighTicketPaymentPlans}
+                midTicketSales={actMidTicketSales}
+                setMidTicketSales={setActMidTicketSales}
+                midTicketPaymentPlans={actMidTicketPaymentPlans}
+                setMidTicketPaymentPlans={setActMidTicketPaymentPlans}
+                upsellUnits={actUpsellUnits}
+                setUpsellUnits={setActUpsellUnits}
+                cashCollectionRate={actCashCollectionRate}
+                setCashCollectionRate={setActCashCollectionRate}
+                roas={actual.roas}
+                roasLabel="Actual ROAS"
+                totalAdSpend={actual.totalAdSpend}
+                netRevenue={actual.netRevenue}
+                grossRevenue={actual.grossRevenue}
+              />
+            )}
           </div>
         </div>
 
