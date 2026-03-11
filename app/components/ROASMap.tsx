@@ -16,7 +16,6 @@ const ROASMap = () => {
   const [predMidTicketSales, setPredMidTicketSales] = useState(4);
   const [predMidTicketPaymentPlans, setPredMidTicketPaymentPlans] = useState(2);
   const [predUpsellUnits, setPredUpsellUnits] = useState(8);
-  const [predCashCollectionRate, setPredCashCollectionRate] = useState(95);
 
   // Actuals Column - Prices
   const [actHighTicketPrice, setActHighTicketPrice] = useState(30000);
@@ -31,7 +30,6 @@ const ROASMap = () => {
   const [actMidTicketSales, setActMidTicketSales] = useState(0);
   const [actMidTicketPaymentPlans, setActMidTicketPaymentPlans] = useState(0);
   const [actUpsellUnits, setActUpsellUnits] = useState(0);
-  const [actCashCollectionRate, setActCashCollectionRate] = useState(95);
 
   // Toggle state for Predictions/Actuals
   const [activeView, setActiveView] = useState<"predictions" | "actuals">("predictions");
@@ -42,7 +40,6 @@ const ROASMap = () => {
   const [scenarioSalesConversion, setScenarioSalesConversion] = useState(15);
   const [scenarioUpgradeRate, setScenarioUpgradeRate] = useState(60);
   const [scenarioUpsellRate, setScenarioUpsellRate] = useState(80);
-  const [scenarioCashCollection, setScenarioCashCollection] = useState(95);
 
   // Calculate ROAS for a given set of inputs
   const calculateROAS = (
@@ -55,11 +52,10 @@ const ROASMap = () => {
     highTicketPrice: number,
     midTicketPrice: number,
     upsellUnits: number,
-    upsellPrice: number,
-    cashCollectionRate: number
+    upsellPrice: number
   ) => {
     const totalSales = highTicketSales + midTicketSales;
-    if (totalSales === 0) return { roas: "0.00", netRevenue: 0, grossRevenue: 0, totalAdSpend: 0 };
+    if (totalSales === 0) return { roas: "0.00", netRevenue: 0, grossRevenue: 0, totalAdSpend: 0, cashCollectionRate: 0 };
 
     // Full pay buyers = total sales - payment plan buyers at each tier
     const fullPayHigh = highTicketSales - highTicketPaymentPlans;
@@ -70,12 +66,16 @@ const ROASMap = () => {
     const paymentPlanRevenue = highTicketPaymentPlans * (highTicketPrice * 0.25) + midTicketPaymentPlans * (midTicketPrice * 0.25); // 25% of tier price
     const upsellRevenue = upsellUnits * upsellPrice;
     const grossRevenue = fullPayRevenue + paymentPlanRevenue + upsellRevenue;
-    const netRevenue = grossRevenue * (cashCollectionRate / 100);
+    const netRevenue = grossRevenue; // No additional deduction - payment plan discount already applied
+
+    // Calculate cash collection rate (what % of full-price revenue we actually collected)
+    const potentialFullRevenue = highTicketSales * highTicketPrice + midTicketSales * midTicketPrice + upsellRevenue;
+    const cashCollectionRate = potentialFullRevenue > 0 ? ((netRevenue / potentialFullRevenue) * 100) : 0;
 
     const totalAdSpend = metaSpend + youtubeSpend;
     const roas = totalAdSpend > 0 ? (netRevenue / totalAdSpend).toFixed(2) : "0.00";
 
-    return { roas, netRevenue, grossRevenue, totalAdSpend };
+    return { roas, netRevenue, grossRevenue, totalAdSpend, cashCollectionRate };
   };
 
   const predicted = calculateROAS(
@@ -88,8 +88,7 @@ const ROASMap = () => {
     predHighTicketPrice,
     predMidTicketPrice,
     predUpsellUnits,
-    predUpsellPrice,
-    predCashCollectionRate
+    predUpsellPrice
   );
 
   const actualsHasData = actMetaSpend > 0 || actYouTubeSpend > 0 || actHighTicketSales > 0 || actMidTicketSales > 0;
@@ -104,8 +103,7 @@ const ROASMap = () => {
     actHighTicketPrice,
     actMidTicketPrice,
     actUpsellUnits,
-    actUpsellPrice,
-    actCashCollectionRate
+    actUpsellPrice
   );
 
   // Variance calculation
@@ -148,8 +146,7 @@ const ROASMap = () => {
     baselineHighTicketPrice,
     baselineMidTicketPrice,
     scenarioUpsellUnits,
-    baselineUpsellPrice,
-    scenarioCashCollection
+    baselineUpsellPrice
   );
 
   return (
@@ -249,7 +246,7 @@ const ROASMap = () => {
 
           {/* Single Column - Conditionally Rendered */}
           <div style={{
-            maxWidth: "700px",
+            maxWidth: "1000px",
             margin: "0 auto"
           }}>
             {activeView === "predictions" && (
@@ -276,13 +273,12 @@ const ROASMap = () => {
               setMidTicketPaymentPlans={setPredMidTicketPaymentPlans}
               upsellUnits={predUpsellUnits}
               setUpsellUnits={setPredUpsellUnits}
-              cashCollectionRate={predCashCollectionRate}
-              setCashCollectionRate={setPredCashCollectionRate}
               roas={predicted.roas}
               roasLabel="Predicted ROAS"
               totalAdSpend={predicted.totalAdSpend}
               netRevenue={predicted.netRevenue}
               grossRevenue={predicted.grossRevenue}
+              cashCollectionRate={predicted.cashCollectionRate}
             />
             )}
 
@@ -310,13 +306,12 @@ const ROASMap = () => {
                 setMidTicketPaymentPlans={setActMidTicketPaymentPlans}
                 upsellUnits={actUpsellUnits}
                 setUpsellUnits={setActUpsellUnits}
-                cashCollectionRate={actCashCollectionRate}
-                setCashCollectionRate={setActCashCollectionRate}
                 roas={actual.roas}
                 roasLabel="Actual ROAS"
                 totalAdSpend={actual.totalAdSpend}
                 netRevenue={actual.netRevenue}
                 grossRevenue={actual.grossRevenue}
+                cashCollectionRate={actual.cashCollectionRate}
               />
             )}
           </div>
@@ -532,16 +527,6 @@ const ROASMap = () => {
               color="#9a17bb"
               format={v => `${v}%`}
             />
-            <Slider
-              label="Cash Collection Rate (%)"
-              value={scenarioCashCollection}
-              min={70}
-              max={100}
-              step={1}
-              onChange={setScenarioCashCollection}
-              color="#3768b5"
-              format={v => `${v}%`}
-            />
           </div>
 
           <div style={{
@@ -693,13 +678,12 @@ const CalculatorColumn = ({
   setMidTicketPaymentPlans,
   upsellUnits,
   setUpsellUnits,
-  cashCollectionRate,
-  setCashCollectionRate,
   roas,
   roasLabel,
   totalAdSpend,
   netRevenue,
-  grossRevenue
+  grossRevenue,
+  cashCollectionRate
 }: any) => {
   const cashInHand = netRevenue - totalAdSpend;
   
@@ -729,86 +713,96 @@ const CalculatorColumn = ({
       </p>
     </div>
 
-    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-      <SectionLabel label="Ad Spend" />
-      <NumberInput label="Meta spend ($)" value={metaSpend} onChange={setMetaSpend} />
-      <NumberInput label="YouTube spend ($)" value={youtubeSpend} onChange={setYouTubeSpend} />
+    {/* Two Column Layout */}
+    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "32px", marginBottom: "24px" }}>
+      {/* Left Column: Ad Spend + Summary */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+        <SectionLabel label="Ad Spend" />
+        <NumberInput label="Meta spend ($)" value={metaSpend} onChange={setMetaSpend} />
+        <NumberInput label="YouTube spend ($)" value={youtubeSpend} onChange={setYouTubeSpend} />
 
-      <SectionLabel label="Sales" />
-      <ProductInput 
-        label="High Ticket" 
-        price={highTicketPrice} 
-        setPrice={setHighTicketPrice}
-        sales={highTicketSales}
-        setSales={setHighTicketSales}
-        salesLabel="Sales"
-        paymentPlans={highTicketPaymentPlans}
-        setPaymentPlans={setHighTicketPaymentPlans}
-      />
-      <ProductInput 
-        label="Mid Ticket" 
-        price={midTicketPrice} 
-        setPrice={setMidTicketPrice}
-        sales={midTicketSales}
-        setSales={setMidTicketSales}
-        salesLabel="Sales"
-        paymentPlans={midTicketPaymentPlans}
-        setPaymentPlans={setMidTicketPaymentPlans}
-      />
-
-      <SectionLabel label="Upsell" />
-      <ProductInput 
-        label="Upsell" 
-        price={upsellPrice} 
-        setPrice={setUpsellPrice}
-        sales={upsellUnits}
-        setSales={setUpsellUnits}
-        salesLabel="Units sold"
-      />
-
-      <SectionLabel label="Cash Collection" />
-      <NumberInput label="Cash Collection Rate (%)" value={cashCollectionRate} onChange={setCashCollectionRate} max={100} />
-    </div>
-
-    <div style={{
-      marginTop: "32px",
-      paddingTop: "24px",
-      borderTop: "2px solid #f6f6f6"
-    }}>
-      {/* Summary Metrics */}
-      <div style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "16px",
-        marginBottom: "24px"
-      }}>
-        <SummaryMetric label="Ad Spend" value={`$${totalAdSpend.toLocaleString()}`} />
-        <SummaryMetric 
-          label="Cash in Hand" 
-          value={`$${Math.round(cashInHand).toLocaleString()}`}
-          highlight
-        />
-        <SummaryMetric label="Net Revenue @ 90d" value={`$${Math.round(netRevenue).toLocaleString()}`} />
+        {/* Summary Metrics */}
+        <div style={{
+          marginTop: "12px",
+          paddingTop: "20px",
+          borderTop: "2px solid #f6f6f6",
+          display: "flex",
+          flexDirection: "column",
+          gap: "16px"
+        }}>
+          <SummaryMetric label="Ad Spend" value={`$${totalAdSpend.toLocaleString()}`} />
+          <SummaryMetric 
+            label="Cash in Hand" 
+            value={`$${Math.round(cashInHand).toLocaleString()}`}
+            highlight
+          />
+          <SummaryMetric label="Net Revenue @ 90d" value={`$${Math.round(netRevenue).toLocaleString()}`} />
+          <SummaryMetric 
+            label="Cash Collection Rate" 
+            value={`${cashCollectionRate.toFixed(1)}%`}
+            color="#3768b5"
+          />
+        </div>
       </div>
 
-      {/* ROAS Display */}
-      <div style={{ textAlign: "center", paddingTop: "20px", borderTop: "1px solid #f6f6f6" }}>
-        <div style={{
-          fontSize: "12px",
-          color: "#888",
-          marginBottom: "8px",
-          textTransform: "uppercase",
-          letterSpacing: "2px"
-        }}>
-          {roasLabel}
-        </div>
-        <div style={{
-          fontSize: "36px",
-          fontWeight: "800",
-          color: "#111314"
-        }}>
-          {roas}x
-        </div>
+      {/* Right Column: Sales */}
+      <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+        <SectionLabel label="Sales" />
+        <ProductInput 
+          label="High Ticket" 
+          price={highTicketPrice} 
+          setPrice={setHighTicketPrice}
+          sales={highTicketSales}
+          setSales={setHighTicketSales}
+          salesLabel="Sales"
+          paymentPlans={highTicketPaymentPlans}
+          setPaymentPlans={setHighTicketPaymentPlans}
+        />
+        <ProductInput 
+          label="Mid Ticket" 
+          price={midTicketPrice} 
+          setPrice={setMidTicketPrice}
+          sales={midTicketSales}
+          setSales={setMidTicketSales}
+          salesLabel="Sales"
+          paymentPlans={midTicketPaymentPlans}
+          setPaymentPlans={setMidTicketPaymentPlans}
+        />
+
+        <SectionLabel label="Upsell" />
+        <ProductInput 
+          label="Upsell" 
+          price={upsellPrice} 
+          setPrice={setUpsellPrice}
+          sales={upsellUnits}
+          setSales={setUpsellUnits}
+          salesLabel="Units sold"
+        />
+      </div>
+    </div>
+
+    {/* ROAS Display */}
+    <div style={{ 
+      textAlign: "center", 
+      paddingTop: "24px", 
+      borderTop: "2px solid #f6f6f6",
+      marginTop: "12px"
+    }}>
+      <div style={{
+        fontSize: "12px",
+        color: "#888",
+        marginBottom: "8px",
+        textTransform: "uppercase",
+        letterSpacing: "2px"
+      }}>
+        {roasLabel}
+      </div>
+      <div style={{
+        fontSize: "36px",
+        fontWeight: "800",
+        color: "#111314"
+      }}>
+        {roas}x
       </div>
     </div>
   </div>
@@ -828,7 +822,7 @@ const SectionLabel = ({ label }: { label: string }) => (
   </div>
 );
 
-const SummaryMetric = ({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) => (
+const SummaryMetric = ({ label, value, highlight, color }: { label: string; value: string; highlight?: boolean; color?: string }) => (
   <div style={{
     display: "flex",
     justifyContent: "space-between",
@@ -848,7 +842,7 @@ const SummaryMetric = ({ label, value, highlight }: { label: string; value: stri
     <div style={{
       fontSize: highlight ? "20px" : "18px",
       fontWeight: "700",
-      color: highlight ? "#3768b5" : "#111314"
+      color: color || (highlight ? "#3768b5" : "#111314")
     }}>
       {value}
     </div>
