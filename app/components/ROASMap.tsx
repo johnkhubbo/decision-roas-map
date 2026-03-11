@@ -82,7 +82,7 @@ const ROASMap = () => {
           <div style={{
             fontSize: "clamp(48px, 8vw, 72px)",
             fontWeight: "800",
-            color: roasColor,
+            color: "#111314",
             marginBottom: "16px",
             lineHeight: 1
           }}>
@@ -90,7 +90,7 @@ const ROASMap = () => {
           </div>
           <div style={{
             display: "inline-block",
-            background: roasColor,
+            background: "#55bdf8",
             color: "#ffffff",
             fontSize: "16px",
             fontWeight: "700",
