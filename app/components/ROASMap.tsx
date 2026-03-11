@@ -21,272 +21,377 @@ const ROASMap = () => {
   const roas = adSpend > 0 ? (netCash / adSpend).toFixed(2) : "0.00";
   const roasNum = parseFloat(roas);
 
-  const roasColor = roasNum >= 3 ? "#00ff87" : roasNum >= 1.5 ? "#ffd60a" : "#ff4d6d";
+  const roasColor = roasNum >= 3 ? "#2bbfd5" : roasNum >= 1.5 ? "#55bdf8" : "#9a17bb";
   const roasLabel = roasNum >= 3 ? "SCALE UP" : roasNum >= 1.5 ? "MAINTAIN" : "REDUCE SPEND";
 
   return (
     <div style={{
-      fontFamily: "'Georgia', serif",
-      background: "#0a0a0f",
+      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
+      background: "#f6f6f6",
       minHeight: "100vh",
-      color: "#e8e0d5",
-      padding: "40px 24px",
-      position: "relative",
-      overflow: "hidden"
+      color: "#111314",
     }}>
-      {/* Background grid */}
-      <div style={{
-        position: "fixed", top: 0, left: 0, right: 0, bottom: 0,
-        backgroundImage: "linear-gradient(rgba(255,214,10,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,214,10,0.03) 1px, transparent 1px)",
-        backgroundSize: "60px 60px",
-        pointerEvents: "none"
-      }} />
-
       {/* Header */}
-      <div style={{ textAlign: "center", marginBottom: "48px", position: "relative" }}>
-        <div style={{
-          fontSize: "11px", letterSpacing: "6px", color: "#ffd60a",
-          textTransform: "uppercase", marginBottom: "12px", fontFamily: "'Georgia', serif"
-        }}>
-          Decision Framework
-        </div>
+      <div style={{
+        background: "linear-gradient(135deg, #2bbfd5 0%, #9a17bb 100%)",
+        padding: "60px 24px",
+        textAlign: "center"
+      }}>
         <h1 style={{
-          fontSize: "clamp(28px, 5vw, 52px)", fontWeight: "normal",
-          letterSpacing: "-1px", margin: 0, lineHeight: 1.1,
-          fontFamily: "'Georgia', serif"
+          fontSize: "clamp(32px, 5vw, 56px)",
+          fontWeight: "700",
+          color: "#ffffff",
+          margin: "0 0 16px 0",
+          lineHeight: 1.2,
         }}>
-          Decision-Making <span style={{ color: "#ffd60a", fontStyle: "italic" }}>ROAS</span> Map
+          Decision-Making ROAS Map
         </h1>
-        <div style={{ width: "60px", height: "1px", background: "#ffd60a", margin: "16px auto 0" }} />
+        <p style={{
+          fontSize: "18px",
+          color: "rgba(255,255,255,0.9)",
+          maxWidth: "600px",
+          margin: "0 auto",
+          fontWeight: "400"
+        }}>
+          Make data-driven ad spend decisions based on 90-day cash attribution
+        </p>
       </div>
 
-      {/* Flow Diagram */}
-      <div style={{ maxWidth: "900px", margin: "0 auto 48px" }}>
+      {/* Main Content */}
+      <div style={{ maxWidth: "1200px", margin: "-40px auto 0", padding: "0 24px 60px" }}>
         
-        {/* Row 1: Inputs */}
-        <div style={{ display: "flex", gap: "16px", marginBottom: "8px", flexWrap: "wrap" }}>
-          <FlowBox label="FULL PAYS" color="#ffd60a" icon="💰"
-            desc="Full price, paid upfront" flex={1} />
-          <FlowBox label="PAYMENT PLANS" color="#c77dff" icon="📅"
-            desc="Worth ¼ of full price at 90 days" flex={1} />
-          <FlowBox label="AD CLICKERS" color="#4cc9f0" icon="🖱️"
-            desc="Anyone who clicked an ad — list or not" flex={1} />
-        </div>
-
-        {/* Arrow down */}
-        <Arrow />
-
-        {/* Row 2: 90-Day Rule */}
+        {/* Decision Card - Above the Fold */}
         <div style={{
-          background: "rgba(255,214,10,0.06)",
-          border: "1px solid rgba(255,214,10,0.3)",
-          borderRadius: "12px", padding: "20px 24px",
-          marginBottom: "8px", position: "relative"
+          background: "#ffffff",
+          borderRadius: "16px",
+          padding: "48px",
+          marginBottom: "32px",
+          boxShadow: "0 4px 24px rgba(0,0,0,0.08)",
+          textAlign: "center"
         }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
-            <div style={{
-              background: "#ffd60a", color: "#0a0a0f",
-              fontSize: "11px", fontWeight: "bold", letterSpacing: "3px",
-              padding: "4px 10px", borderRadius: "4px"
-            }}>90-DAY RULE</div>
-            <div style={{ fontSize: "15px", color: "#e8e0d5" }}>
-              Collect cash at <strong style={{ color: "#ffd60a" }}>90 days</strong> — the attribution window for decision-making
-            </div>
-          </div>
-          <div style={{ marginTop: "12px", display: "flex", gap: "24px", flexWrap: "wrap" }}>
-            <Pill label="Full Pay" value={`$${fullPay.toLocaleString()}`} color="#ffd60a" />
-            <Pill label="Plan Value @ 90d" value={`$${planValue.toLocaleString()}`} color="#c77dff" sub="(¼ of full price)" />
-            <Pill label="Example Cash/Sale" value={`$${(fullPay * 0.75 + planValue * 0.25 * 2).toLocaleString()}`} color="#4cc9f0" sub="(50/50 split)" />
-          </div>
-        </div>
-
-        <Arrow />
-
-        {/* Row 3: Deductions */}
-        <div style={{
-          background: "rgba(255,77,109,0.06)",
-          border: "1px solid rgba(255,77,109,0.3)",
-          borderRadius: "12px", padding: "20px 24px",
-          marginBottom: "8px"
-        }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "12px", marginBottom: "8px" }}>
-            <div style={{
-              background: "#ff4d6d", color: "#fff",
-              fontSize: "11px", fontWeight: "bold", letterSpacing: "3px",
-              padding: "4px 10px", borderRadius: "4px"
-            }}>DEDUCTIONS</div>
-          </div>
-          <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", alignItems: "center" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <span style={{ fontSize: "20px" }}>⚠️</span>
-              <span style={{ color: "#ff4d6d", fontWeight: "bold" }}>Defaults</span>
-              <span style={{ color: "#aaa", fontSize: "13px" }}>— payment plan buyers who stop paying</span>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <span style={{ fontSize: "20px" }}>↩️</span>
-              <span style={{ color: "#ff4d6d", fontWeight: "bold" }}>Refunds</span>
-              <span style={{ color: "#aaa", fontSize: "13px" }}>— typical 2–3% off gross</span>
-            </div>
-          </div>
-        </div>
-
-        <Arrow />
-
-        {/* Row 4: The Formula */}
-        <div style={{
-          background: "rgba(76,201,240,0.06)",
-          border: "2px solid rgba(76,201,240,0.4)",
-          borderRadius: "12px", padding: "24px",
-          marginBottom: "8px", textAlign: "center"
-        }}>
-          <div style={{ fontSize: "12px", letterSpacing: "4px", color: "#4cc9f0", marginBottom: "16px" }}>
-            THE FORMULA
+          <div style={{
+            fontSize: "14px",
+            letterSpacing: "2px",
+            color: "#3768b5",
+            fontWeight: "600",
+            marginBottom: "16px",
+            textTransform: "uppercase"
+          }}>
+            Your Decision
           </div>
           <div style={{
-            fontSize: "clamp(13px, 2vw, 17px)",
-            lineHeight: 2, color: "#e8e0d5"
+            fontSize: "clamp(48px, 8vw, 72px)",
+            fontWeight: "800",
+            color: roasColor,
+            marginBottom: "16px",
+            lineHeight: 1
           }}>
-            <span style={{ color: "#4cc9f0", fontWeight: "bold", fontSize: "clamp(14px, 2.2vw, 19px)" }}>
-              Decision-Making ROAS
-            </span>
-            {" = "}
-            <span style={{ color: "#ffd60a" }}>(Full Pays × Full Price)</span>
-            {" + "}
-            <span style={{ color: "#c77dff" }}>(Plan Buyers × ¼ Price)</span>
-            {" − "}
-            <span style={{ color: "#ff4d6d" }}>Refunds</span>
-            <br />
-            <span style={{ color: "#888", fontSize: "clamp(12px, 1.8vw, 15px)" }}>
-              ÷ Ad Spend{" "}
-              <span style={{ color: "#555", fontSize: "12px" }}>
-                [ all from cold traffic or ad clicks, regardless of list status ]
-              </span>
-            </span>
+            {roas}x ROAS
+          </div>
+          <div style={{
+            display: "inline-block",
+            background: roasColor,
+            color: "#ffffff",
+            fontSize: "16px",
+            fontWeight: "700",
+            letterSpacing: "2px",
+            padding: "12px 32px",
+            borderRadius: "8px"
+          }}>
+            {roasLabel}
           </div>
         </div>
 
-        <Arrow />
-
-        {/* Row 5: Decision */}
+        {/* Calculator Card - Above the Fold */}
         <div style={{
-          background: `rgba(${roasNum >= 3 ? "0,255,135" : roasNum >= 1.5 ? "255,214,10" : "255,77,109"},0.08)`,
-          border: `2px solid ${roasColor}`,
-          borderRadius: "12px", padding: "24px",
-          transition: "all 0.4s ease"
+          background: "#ffffff",
+          borderRadius: "16px",
+          padding: "48px",
+          marginBottom: "32px",
+          boxShadow: "0 4px 24px rgba(0,0,0,0.08)"
         }}>
-          <div style={{ textAlign: "center", marginBottom: "8px" }}>
-            <div style={{ fontSize: "11px", letterSpacing: "4px", color: roasColor, marginBottom: "4px" }}>
-              THE DECISION
-            </div>
-            <div style={{ fontSize: "clamp(32px, 6vw, 56px)", fontWeight: "bold", color: roasColor, letterSpacing: "-1px" }}>
-              {roas}x ROAS
-            </div>
-            <div style={{
-              display: "inline-block", background: roasColor, color: "#0a0a0f",
-              fontSize: "12px", fontWeight: "bold", letterSpacing: "4px",
-              padding: "6px 18px", borderRadius: "4px", marginTop: "8px"
+          <h2 style={{
+            fontSize: "28px",
+            fontWeight: "700",
+            color: "#111314",
+            marginBottom: "32px",
+            marginTop: 0
+          }}>
+            Interactive Calculator
+          </h2>
+
+          {/* Sliders Grid */}
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+            gap: "32px",
+            marginBottom: "40px"
+          }}>
+            <Slider
+              label="Full Price"
+              value={fullPay}
+              min={1000}
+              max={50000}
+              step={500}
+              onChange={setFullPay}
+              color="#3768b5"
+              format={v => `$${v.toLocaleString()}`}
+            />
+            <Slider
+              label="Payment Plan %"
+              value={paymentPlanPct}
+              min={0}
+              max={100}
+              step={5}
+              onChange={setPaymentPlanPct}
+              color="#55bdf8"
+              format={v => `${v}%`}
+            />
+            <Slider
+              label="Plan Default Rate %"
+              value={defaultRate}
+              min={0}
+              max={20}
+              step={0.5}
+              onChange={setDefaultRate}
+              color="#9a17bb"
+              format={v => `${v}%`}
+            />
+            <Slider
+              label="Refund Rate %"
+              value={refundRate}
+              min={0}
+              max={10}
+              step={0.5}
+              onChange={setRefundRate}
+              color="#9a17bb"
+              format={v => `${v}%`}
+            />
+            <Slider
+              label="Ad Spend"
+              value={adSpend}
+              min={100}
+              max={50000}
+              step={100}
+              onChange={setAdSpend}
+              color="#2bbfd5"
+              format={v => `$${v.toLocaleString()}`}
+            />
+            <Slider
+              label="Total Ad Sales"
+              value={sales}
+              min={1}
+              max={100}
+              step={1}
+              onChange={setSales}
+              color="#2bbfd5"
+              format={v => `${v} sales`}
+            />
+          </div>
+
+          {/* Summary Grid */}
+          <div style={{
+            borderTop: "2px solid #f6f6f6",
+            paddingTop: "32px",
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+            gap: "24px"
+          }}>
+            <MetricCard
+              label="Gross Cash"
+              value={`$${grossCash.toLocaleString("en", { maximumFractionDigits: 0 })}`}
+              color="#111314"
+            />
+            <MetricCard
+              label="Default Deduction"
+              value={`−$${defaultDeduction.toLocaleString("en", { maximumFractionDigits: 0 })}`}
+              color="#9a17bb"
+            />
+            <MetricCard
+              label="Refund Deduction"
+              value={`−$${refundDeduction.toLocaleString("en", { maximumFractionDigits: 0 })}`}
+              color="#9a17bb"
+            />
+            <MetricCard
+              label="Net Cash @ 90d"
+              value={`$${netCash.toLocaleString("en", { maximumFractionDigits: 0 })}`}
+              color="#3768b5"
+              highlight
+            />
+          </div>
+        </div>
+
+        {/* Educational Content - Below the Fold */}
+        <div style={{
+          background: "#ffffff",
+          borderRadius: "16px",
+          padding: "48px",
+          marginBottom: "32px",
+          boxShadow: "0 4px 24px rgba(0,0,0,0.08)"
+        }}>
+          <h2 style={{
+            fontSize: "28px",
+            fontWeight: "700",
+            color: "#111314",
+            marginBottom: "32px",
+            marginTop: 0
+          }}>
+            How It Works
+          </h2>
+
+          {/* The 3 Inputs */}
+          <div style={{ marginBottom: "48px" }}>
+            <h3 style={{
+              fontSize: "20px",
+              fontWeight: "600",
+              color: "#3768b5",
+              marginBottom: "24px"
             }}>
-              {roasLabel}
+              The 3 Revenue Inputs
+            </h3>
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+              gap: "24px"
+            }}>
+              <InfoBox
+                icon="💰"
+                title="Full Pays"
+                description="Customers who paid the full price upfront"
+                color="#3768b5"
+              />
+              <InfoBox
+                icon="📅"
+                title="Payment Plans"
+                description="Worth ¼ of full price at 90 days"
+                color="#55bdf8"
+              />
+              <InfoBox
+                icon="🖱️"
+                title="Ad Clickers"
+                description="Anyone who clicked an ad — list or not"
+                color="#2bbfd5"
+              />
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Interactive Calculator */}
-      <div style={{ maxWidth: "900px", margin: "0 auto" }}>
-        <div style={{
-          background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)",
-          borderRadius: "16px", padding: "32px"
-        }}>
-          <div style={{ fontSize: "11px", letterSpacing: "5px", color: "#888", marginBottom: "24px" }}>
-            INTERACTIVE CALCULATOR
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "24px" }}>
-            <Slider label="Full Price ($)" value={fullPay} min={1000} max={50000} step={500}
-              onChange={setFullPay} color="#ffd60a" format={v => `$${v.toLocaleString()}`} />
-            <Slider label="Payment Plan %" value={paymentPlanPct} min={0} max={100} step={5}
-              onChange={setPaymentPlanPct} color="#c77dff" format={v => `${v}%`} />
-            <Slider label="Plan Default Rate %" value={defaultRate} min={0} max={20} step={0.5}
-              onChange={setDefaultRate} color="#ff9500" format={v => `${v}%`} />
-            <Slider label="Refund Rate %" value={refundRate} min={0} max={10} step={0.5}
-              onChange={setRefundRate} color="#ff4d6d" format={v => `${v}%`} />
-            <Slider label="Ad Spend ($)" value={adSpend} min={100} max={50000} step={100}
-              onChange={setAdSpend} color="#4cc9f0" format={v => `$${v.toLocaleString()}`} />
-            <Slider label="Total Ad Sales" value={sales} min={1} max={100} step={1}
-              onChange={setSales} color="#00ff87" format={v => `${v} sales`} />
+          {/* The 90-Day Rule */}
+          <div style={{ marginBottom: "48px" }}>
+            <h3 style={{
+              fontSize: "20px",
+              fontWeight: "600",
+              color: "#3768b5",
+              marginBottom: "16px"
+            }}>
+              The 90-Day Rule
+            </h3>
+            <div style={{
+              background: "#f6f6f6",
+              padding: "24px",
+              borderRadius: "12px",
+              borderLeft: "4px solid #55bdf8"
+            }}>
+              <p style={{
+                fontSize: "16px",
+                lineHeight: 1.7,
+                color: "#111314",
+                margin: 0
+              }}>
+                Collect cash at <strong style={{ color: "#3768b5" }}>90 days</strong> — the attribution window for decision-making. 
+                This is real cash-in-hand, not future projections. You can extend to 120–180 days if you have access to capital.
+              </p>
+            </div>
           </div>
 
-          {/* Summary */}
+          {/* Deductions */}
+          <div style={{ marginBottom: "48px" }}>
+            <h3 style={{
+              fontSize: "20px",
+              fontWeight: "600",
+              color: "#3768b5",
+              marginBottom: "24px"
+            }}>
+              Deductions
+            </h3>
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+              gap: "24px"
+            }}>
+              <InfoBox
+                icon="⚠️"
+                title="Payment Plan Defaults"
+                description="Buyers who stop paying before completing their plan (typically 5%)"
+                color="#9a17bb"
+              />
+              <InfoBox
+                icon="↩️"
+                title="Refunds"
+                description="Typical 2–3% off gross revenue, applies to all sales"
+                color="#9a17bb"
+              />
+            </div>
+          </div>
+
+          {/* The Formula */}
+          <div style={{ marginBottom: "48px" }}>
+            <h3 style={{
+              fontSize: "20px",
+              fontWeight: "600",
+              color: "#3768b5",
+              marginBottom: "16px"
+            }}>
+              The Formula
+            </h3>
+            <div style={{
+              background: "linear-gradient(135deg, #2bbfd5 0%, #9a17bb 100%)",
+              padding: "32px",
+              borderRadius: "12px",
+              textAlign: "center"
+            }}>
+              <div style={{
+                fontSize: "clamp(16px, 3vw, 20px)",
+                color: "#ffffff",
+                lineHeight: 1.8,
+                fontWeight: "500"
+              }}>
+                <strong style={{ fontSize: "clamp(18px, 3.5vw, 24px)" }}>Decision-Making ROAS</strong>
+                <br />
+                = (Full Pays × Full Price) + (Plan Buyers × ¼ Price) − Defaults − Refunds
+                <br />
+                <span style={{ fontSize: "clamp(14px, 2.5vw, 18px)", opacity: 0.9 }}>
+                  ÷ Ad Spend
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Attribution Rule */}
           <div style={{
-            marginTop: "28px", paddingTop: "24px",
-            borderTop: "1px solid rgba(255,255,255,0.08)",
-            display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))",
-            gap: "16px"
+            background: "#f6f6f6",
+            padding: "24px",
+            borderRadius: "12px",
+            borderLeft: "4px solid #2bbfd5"
           }}>
-            <SummaryItem label="Gross Cash" value={`$${grossCash.toLocaleString("en", { maximumFractionDigits: 0 })}`} />
-            <SummaryItem label="Default Deduction" value={`−$${defaultDeduction.toLocaleString("en", { maximumFractionDigits: 0 })}`} color="#ff9500" />
-            <SummaryItem label="Refund Deduction" value={`−$${refundDeduction.toLocaleString("en", { maximumFractionDigits: 0 })}`} color="#ff4d6d" />
-            <SummaryItem label="Net Cash @ 90d" value={`$${netCash.toLocaleString("en", { maximumFractionDigits: 0 })}`} color="#ffd60a" />
-            <SummaryItem label="Decision ROAS" value={`${roas}x`} color={roasColor} big />
-          </div>
-        </div>
-
-        {/* Attribution Rule callout */}
-        <div style={{
-          marginTop: "20px",
-          background: "rgba(76,201,240,0.04)",
-          border: "1px solid rgba(76,201,240,0.15)",
-          borderRadius: "10px", padding: "16px 20px",
-          display: "flex", gap: "12px", alignItems: "flex-start"
-        }}>
-          <span style={{ fontSize: "18px", flexShrink: 0 }}>📌</span>
-          <div style={{ fontSize: "13px", color: "#aaa", lineHeight: 1.7 }}>
-            <strong style={{ color: "#4cc9f0" }}>Attribution Rule:</strong> Anyone who <em>clicked on an ad</em> and purchased is attributed — 
-            regardless of whether they were already on your list. Cash collected from those people at 90 days 
-            (less defaults and refunds) is your Decision-Making ROAS. Use 120–180 days only if you have access to capital.
+            <div style={{
+              display: "flex",
+              gap: "16px",
+              alignItems: "flex-start"
+            }}>
+              <span style={{ fontSize: "24px", flexShrink: 0 }}>📌</span>
+              <div style={{ fontSize: "15px", lineHeight: 1.7, color: "#111314" }}>
+                <strong style={{ color: "#3768b5" }}>Attribution Rule:</strong> Anyone who <em>clicked on an ad</em> and 
+                purchased is attributed — regardless of whether they were already on your list. Cash collected from those 
+                people at 90 days (less defaults and refunds) is your Decision-Making ROAS. Use 120–180 days only if you 
+                have access to capital.
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
 };
-
-const FlowBox = ({ label, color, icon, desc, flex }: { 
-  label: string; 
-  color: string; 
-  icon: string; 
-  desc: string; 
-  flex: number;
-}) => (
-  <div style={{
-    flex, minWidth: "160px",
-    background: `rgba(${color === "#ffd60a" ? "255,214,10" : color === "#c77dff" ? "199,125,255" : "76,201,240"},0.07)`,
-    border: `1px solid ${color}44`,
-    borderRadius: "10px", padding: "16px",
-    display: "flex", flexDirection: "column", gap: "6px"
-  }}>
-    <div style={{ fontSize: "22px" }}>{icon}</div>
-    <div style={{ fontSize: "11px", letterSpacing: "3px", color, fontWeight: "bold" }}>{label}</div>
-    <div style={{ fontSize: "12px", color: "#888", lineHeight: 1.5 }}>{desc}</div>
-  </div>
-);
-
-const Arrow = () => (
-  <div style={{ textAlign: "center", fontSize: "20px", color: "#444", margin: "4px 0" }}>↓</div>
-);
-
-const Pill = ({ label, value, color, sub }: { 
-  label: string; 
-  value: string; 
-  color: string; 
-  sub?: string;
-}) => (
-  <div>
-    <div style={{ fontSize: "11px", color: "#666", letterSpacing: "2px", marginBottom: "2px" }}>{label}</div>
-    <div style={{ fontSize: "18px", fontWeight: "bold", color }}>{value}</div>
-    {sub && <div style={{ fontSize: "11px", color: "#555" }}>{sub}</div>}
-  </div>
-);
 
 const Slider = ({ label, value, min, max, step, onChange, color, format }: {
   label: string;
@@ -299,25 +404,129 @@ const Slider = ({ label, value, min, max, step, onChange, color, format }: {
   format: (value: number) => string;
 }) => (
   <div>
-    <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
-      <span style={{ fontSize: "11px", letterSpacing: "2px", color: "#777" }}>{label}</span>
-      <span style={{ fontSize: "13px", fontWeight: "bold", color }}>{format(value)}</span>
+    <div style={{
+      display: "flex",
+      justifyContent: "space-between",
+      marginBottom: "12px",
+      alignItems: "baseline"
+    }}>
+      <label style={{
+        fontSize: "14px",
+        fontWeight: "600",
+        color: "#111314"
+      }}>
+        {label}
+      </label>
+      <span style={{
+        fontSize: "18px",
+        fontWeight: "700",
+        color: color
+      }}>
+        {format(value)}
+      </span>
     </div>
-    <input type="range" min={min} max={max} step={step} value={value}
+    <input
+      type="range"
+      min={min}
+      max={max}
+      step={step}
+      value={value}
       onChange={e => onChange(parseFloat(e.target.value))}
-      style={{ width: "100%", accentColor: color, cursor: "pointer" }} />
+      style={{
+        width: "100%",
+        height: "6px",
+        borderRadius: "3px",
+        appearance: "none",
+        background: `linear-gradient(to right, ${color} 0%, ${color} ${((value - min) / (max - min)) * 100}%, #e0e0e0 ${((value - min) / (max - min)) * 100}%, #e0e0e0 100%)`,
+        outline: "none",
+        cursor: "pointer"
+      }}
+    />
+    <style jsx>{`
+      input[type="range"]::-webkit-slider-thumb {
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: ${color};
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      }
+      input[type="range"]::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: ${color};
+        cursor: pointer;
+        border: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      }
+    `}</style>
   </div>
 );
 
-const SummaryItem = ({ label, value, color = "#e8e0d5", big }: {
+const MetricCard = ({ label, value, color, highlight }: {
   label: string;
   value: string;
-  color?: string;
-  big?: boolean;
+  color: string;
+  highlight?: boolean;
 }) => (
-  <div>
-    <div style={{ fontSize: "10px", letterSpacing: "2px", color: "#555", marginBottom: "4px" }}>{label}</div>
-    <div style={{ fontSize: big ? "26px" : "16px", fontWeight: "bold", color }}>{value}</div>
+  <div style={{
+    background: highlight ? "#f6f6f6" : "transparent",
+    padding: highlight ? "20px" : "12px 0",
+    borderRadius: highlight ? "12px" : "0",
+    border: highlight ? "2px solid #3768b5" : "none"
+  }}>
+    <div style={{
+      fontSize: "12px",
+      fontWeight: "600",
+      color: "#888",
+      marginBottom: "8px",
+      textTransform: "uppercase",
+      letterSpacing: "1px"
+    }}>
+      {label}
+    </div>
+    <div style={{
+      fontSize: highlight ? "28px" : "24px",
+      fontWeight: "700",
+      color: color
+    }}>
+      {value}
+    </div>
+  </div>
+);
+
+const InfoBox = ({ icon, title, description, color }: {
+  icon: string;
+  title: string;
+  description: string;
+  color: string;
+}) => (
+  <div style={{
+    background: "#f6f6f6",
+    padding: "24px",
+    borderRadius: "12px",
+    borderTop: `4px solid ${color}`
+  }}>
+    <div style={{ fontSize: "32px", marginBottom: "12px" }}>{icon}</div>
+    <h4 style={{
+      fontSize: "16px",
+      fontWeight: "700",
+      color: "#111314",
+      marginBottom: "8px",
+      marginTop: 0
+    }}>
+      {title}
+    </h4>
+    <p style={{
+      fontSize: "14px",
+      lineHeight: 1.6,
+      color: "#666",
+      margin: 0
+    }}>
+      {description}
+    </p>
   </div>
 );
 
