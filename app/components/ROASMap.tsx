@@ -186,6 +186,9 @@ const ROASMap = () => {
               setCashCollectionRate={setPredCashCollectionRate}
               roas={predicted.roas}
               roasLabel="Predicted ROAS"
+              totalAdSpend={predicted.totalAdSpend}
+              netRevenue={predicted.netRevenue}
+              grossRevenue={predicted.grossRevenue}
             />
 
             {/* Actuals Column */}
@@ -208,6 +211,9 @@ const ROASMap = () => {
               setCashCollectionRate={setActCashCollectionRate}
               roas={actual.roas}
               roasLabel="Actual ROAS"
+              totalAdSpend={actual.totalAdSpend}
+              netRevenue={actual.netRevenue}
+              grossRevenue={actual.grossRevenue}
             />
           </div>
         </div>
@@ -578,8 +584,14 @@ const CalculatorColumn = ({
   cashCollectionRate,
   setCashCollectionRate,
   roas,
-  roasLabel
-}: any) => (
+  roasLabel,
+  totalAdSpend,
+  netRevenue,
+  grossRevenue
+}: any) => {
+  const cashInHand = netRevenue - totalAdSpend;
+  
+  return (
   <div style={{
     background: "#ffffff",
     borderRadius: "16px",
@@ -625,28 +637,47 @@ const CalculatorColumn = ({
     <div style={{
       marginTop: "32px",
       paddingTop: "24px",
-      borderTop: "2px solid #f6f6f6",
-      textAlign: "center"
+      borderTop: "2px solid #f6f6f6"
     }}>
+      {/* Summary Metrics */}
       <div style={{
-        fontSize: "12px",
-        color: "#888",
-        marginBottom: "8px",
-        textTransform: "uppercase",
-        letterSpacing: "2px"
+        display: "flex",
+        flexDirection: "column",
+        gap: "16px",
+        marginBottom: "24px"
       }}>
-        {roasLabel}
+        <SummaryMetric label="Ad Spend" value={`$${totalAdSpend.toLocaleString()}`} />
+        <SummaryMetric 
+          label="Cash in Hand" 
+          value={`$${Math.round(cashInHand).toLocaleString()}`}
+          highlight
+        />
+        <SummaryMetric label="Net Revenue @ 90d" value={`$${Math.round(netRevenue).toLocaleString()}`} />
       </div>
-      <div style={{
-        fontSize: "36px",
-        fontWeight: "800",
-        color: "#111314"
-      }}>
-        {roas}x
+
+      {/* ROAS Display */}
+      <div style={{ textAlign: "center", paddingTop: "20px", borderTop: "1px solid #f6f6f6" }}>
+        <div style={{
+          fontSize: "12px",
+          color: "#888",
+          marginBottom: "8px",
+          textTransform: "uppercase",
+          letterSpacing: "2px"
+        }}>
+          {roasLabel}
+        </div>
+        <div style={{
+          fontSize: "36px",
+          fontWeight: "800",
+          color: "#111314"
+        }}>
+          {roas}x
+        </div>
       </div>
     </div>
   </div>
-);
+  );
+};
 
 const SectionLabel = ({ label }: { label: string }) => (
   <div style={{
@@ -658,6 +689,33 @@ const SectionLabel = ({ label }: { label: string }) => (
     marginTop: "8px"
   }}>
     {label}
+  </div>
+);
+
+const SummaryMetric = ({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) => (
+  <div style={{
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: highlight ? "12px 16px" : "8px 0",
+    background: highlight ? "#f6f6f6" : "transparent",
+    borderRadius: highlight ? "8px" : "0",
+    border: highlight ? "2px solid #55bdf8" : "none"
+  }}>
+    <div style={{
+      fontSize: "13px",
+      color: "#666",
+      fontWeight: "600"
+    }}>
+      {label}
+    </div>
+    <div style={{
+      fontSize: highlight ? "20px" : "18px",
+      fontWeight: "700",
+      color: highlight ? "#3768b5" : "#111314"
+    }}>
+      {value}
+    </div>
   </div>
 );
 
