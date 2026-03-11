@@ -672,6 +672,7 @@ const CalculatorColumn = ({
         setPrice={setHighTicketPrice}
         sales={highTicketSales}
         setSales={setHighTicketSales}
+        salesLabel="Sales"
       />
       <ProductInput 
         label="Mid Ticket" 
@@ -679,6 +680,7 @@ const CalculatorColumn = ({
         setPrice={setMidTicketPrice}
         sales={midTicketSales}
         setSales={setMidTicketSales}
+        salesLabel="Sales"
       />
       <NumberInput label="Buyers on payment plans (total count)" value={paymentPlanBuyers} onChange={setPaymentPlanBuyers} />
 
@@ -812,7 +814,7 @@ const NumberInput = ({ label, value, onChange, max }: any) => (
   </div>
 );
 
-const ProductInput = ({ label, price, setPrice, sales, setSales, salesLabel = "Sales" }: any) => (
+const ProductInput = ({ label, price, setPrice, sales, setSales, salesLabel = "Units sold" }: any) => (
   <div>
     <label style={{
       display: "block",
@@ -822,35 +824,62 @@ const ProductInput = ({ label, price, setPrice, sales, setSales, salesLabel = "S
     }}>
       {label}
     </label>
-    <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+    <div style={{ display: "flex", gap: "8px", alignItems: "flex-start" }}>
       <div style={{ flex: "0 0 auto", width: "120px" }}>
-        <input
-          type="number"
-          value={price}
-          onChange={e => setPrice(parseFloat(e.target.value) || 0)}
-          min={0}
-          placeholder="Price"
-          style={{
-            width: "100%",
-            padding: "10px 8px",
+        <div style={{
+          fontSize: "11px",
+          color: "#999",
+          marginBottom: "4px",
+          fontWeight: "600"
+        }}>
+          Price
+        </div>
+        <div style={{ position: "relative" }}>
+          <span style={{
+            position: "absolute",
+            left: "8px",
+            top: "50%",
+            transform: "translateY(-50%)",
+            color: "#999",
             fontSize: "12px",
-            border: "1px solid #e0e0e0",
-            borderRadius: "8px",
-            fontFamily: "inherit",
-            outline: "none",
-            color: "#666"
-          }}
-          onFocus={(e) => e.target.style.borderColor = "#55bdf8"}
-          onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
-        />
+            pointerEvents: "none"
+          }}>
+            $
+          </span>
+          <input
+            type="number"
+            value={price}
+            onChange={e => setPrice(parseFloat(e.target.value) || 0)}
+            min={0}
+            style={{
+              width: "100%",
+              padding: "10px 8px 10px 18px",
+              fontSize: "12px",
+              border: "1px solid #e0e0e0",
+              borderRadius: "8px",
+              fontFamily: "inherit",
+              outline: "none",
+              color: "#111314"
+            }}
+            onFocus={(e) => e.target.style.borderColor = "#55bdf8"}
+            onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
+          />
+        </div>
       </div>
       <div style={{ flex: 1 }}>
+        <div style={{
+          fontSize: "11px",
+          color: "#999",
+          marginBottom: "4px",
+          fontWeight: "600"
+        }}>
+          {salesLabel}
+        </div>
         <input
           type="number"
           value={sales}
           onChange={e => setSales(parseFloat(e.target.value) || 0)}
           min={0}
-          placeholder={salesLabel}
           style={{
             width: "100%",
             padding: "10px 12px",
