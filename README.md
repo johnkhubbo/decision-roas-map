@@ -1,36 +1,92 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Decision-Making ROAS Map
 
-## Getting Started
+**Live URL:** https://decision-roas-map.vercel.app
 
-First, run the development server:
+An interactive calculator for making data-driven ad spend decisions based on 90-day cash attribution.
+
+## Overview
+
+This tool helps you calculate your **Decision-Making ROAS** — the real cash-in-hand metric that tells you whether to scale up, maintain, or reduce your ad spend.
+
+### Key Features
+
+- **Three Revenue Inputs:**
+  - Full Pays (customers who paid upfront)
+  - Payment Plan Buyers (counted at ¼ value at 90 days)
+  - Ad Spend tracking
+
+- **90-Day Attribution Window:**
+  - Standard decision window for cash-in-hand
+  - Can extend to 120-180 days with available capital
+
+- **Automatic Deductions:**
+  - ~2-3% refund rate applied to gross revenue
+
+- **Decision Formula:**
+  ```
+  (Full Pays × Full Price) + (Plan Buyers × ¼ Price) − Refunds
+  ÷ Ad Spend = Decision ROAS
+  ```
+
+- **Clear Action Signals:**
+  - ≥3.0x ROAS → **SCALE UP** (green)
+  - ≥1.5x ROAS → **MAINTAIN** (yellow)
+  - <1.5x ROAS → **REDUCE SPEND** (red)
+
+### Attribution Rule
+
+**Critical:** Anyone who clicked your ad and purchased counts — regardless of whether they were already on your list. This prevents undervaluing ads by excluding "warm" traffic.
+
+## Tech Stack
+
+- **Framework:** Next.js 16 (App Router)
+- **Styling:** Inline styles (dark theme with Georgia serif typography)
+- **Deployment:** Vercel
+- **Type Safety:** TypeScript
+
+## Local Development
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Build
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run build
+npm start
+```
 
-## Learn More
+## Deployment
 
-To learn more about Next.js, take a look at the following resources:
+Deployed to Vercel via:
+```bash
+npx vercel --prod
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Calculator Inputs (Sliders)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. **Full Price ($):** 1,000 - 50,000 (step: 500)
+2. **Payment Plan %:** 0 - 100% (step: 5)
+3. **Refund Rate %:** 0 - 10% (step: 0.5)
+4. **Ad Spend ($):** 100 - 50,000 (step: 100)
+5. **Total Ad Sales:** 1 - 100 (step: 1)
 
-## Deploy on Vercel
+## Default Values
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+- Full Price: $22,000
+- Payment Plan Split: 50%
+- Refund Rate: 3%
+- Ad Spend: $5,000
+- Total Sales: 10
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Result:** 26.68x ROAS → SCALE UP
+
+---
+
+**Built by:** Larrabee (OpenClaw AI Assistant)  
+**For:** John Hubbard  
+**Date:** March 11, 2026
