@@ -85,393 +85,280 @@ function InputField({ label, prefix, value, onChange, placeholder = "0" }: any) 
   );
 }
 
-const ROASMap = () => {
-  const [activeView, setActiveView] = useState<"predictions" | "actuals">("predictions");
-  const [pred, setPred] = useState({ ...EMPTY, meta: "3000", youtube: "2000", htSales: "6", htPlans: "3", mtSales: "4", mtPlans: "2", upsellUnits: "8" });
-  const [act, setAct] = useState({ ...EMPTY });
+function TierBlock({ title, price, salesVal, plansVal, onSales, onPlans }: any) {
+  return (
+    <div style={{
+      background: "#fff",
+      border: "1.5px solid #e2e8f0",
+      borderRadius: "14px",
+      padding: "18px",
+      display: "flex", flexDirection: "column", gap: "14px"
+    }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <span style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a", letterSpacing: "-0.01em" }}>{title}</span>
+        <span style={{
+          background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
+          color: "#fff", fontSize: "12px", fontWeight: "700",
+          padding: "3px 10px", borderRadius: "20px", letterSpacing: "0.02em"
+        }}>${(price / 1000).toFixed(0)}k</span>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "10px" }}>
+        <InputField label="Sales" value={salesVal} onChange={onSales} />
+        <InputField label="On Plans" value={plansVal} onChange={onPlans} />
+      </div>
+    </div>
+  );
+}
 
-  const predicted = calcROAS(pred);
-  const actual = calcROAS(act);
-  const actualsHasData = +act.meta > 0 || +act.youtube > 0 || +act.htSales > 0 || +act.mtSales > 0;
-
-  const displayROAS = actualsHasData ? actual.roas : predicted.roas;
-  const roasLabel = displayROAS >= 3 ? "SCALE UP" : displayROAS >= 1.5 ? "MAINTAIN" : "REDUCE SPEND";
-
-  const animatedPredROAS = useAnimatedNumber(predicted.roas);
-  const animatedActROAS = useAnimatedNumber(actual.roas);
-
-  const variance = actualsHasData && predicted.roas > 0
-    ? (((actual.roas - predicted.roas) / predicted.roas) * 100).toFixed(1)
-    : "0.0";
+function ROASBadge({ roas }: any) {
+  const animVal = useAnimatedNumber(isFinite(roas) ? roas : 0);
+  const decision = roas >= 3 ? { label: "SCALE UP", bg: "linear-gradient(135deg, #10b981, #059669)", dot: "#34d399" }
+    : roas >= 1.5 ? { label: "MAINTAIN", bg: "linear-gradient(135deg, #f59e0b, #d97706)", dot: "#fbbf24" }
+    : { label: "REDUCE SPEND", bg: "linear-gradient(135deg, #ef4444, #dc2626)", dot: "#f87171" };
 
   return (
     <div style={{
-      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-      background: "#f6f6f6",
-      minHeight: "100vh",
-      color: "#111314",
+      background: "linear-gradient(135deg, #0f172a 0%, #1e293b 100%)",
+      borderRadius: "20px",
+      padding: "28px 32px",
+      display: "flex", alignItems: "center", justifyContent: "space-between",
+      boxShadow: "0 20px 60px rgba(15,23,42,0.18), 0 4px 16px rgba(15,23,42,0.1)",
+      flexWrap: "wrap", gap: "20px",
+      position: "sticky", top: "16px", zIndex: 10
     }}>
-      {/* Header */}
-      <div style={{
-        background: "linear-gradient(135deg, #2bbfd5 0%, #9a17bb 100%)",
-        padding: "60px 24px 80px",
-        textAlign: "center"
-      }}>
-        <h1 style={{
-          fontSize: "clamp(32px, 5vw, 56px)",
-          fontWeight: "700",
-          color: "#ffffff",
-          margin: "0 0 16px 0",
-          lineHeight: 1.2,
-        }}>
-          Decision-Making ROAS Map
-        </h1>
-        <p style={{
-          fontSize: "18px",
-          color: "rgba(255,255,255,0.95)",
-          maxWidth: "700px",
-          margin: "0 auto",
-          fontWeight: "400",
-          lineHeight: 1.6
-        }}>
-          Track predicted vs actual performance at 90 days, then model what-if scenarios to optimize your funnel.
-        </p>
-      </div>
-
-      {/* Main Content */}
-      <div style={{ maxWidth: "1400px", margin: "-60px auto 0", padding: "0 24px 60px" }}>
-        
-        {/* Toggle Control */}
-        <div style={{
-          display: "flex",
-          justifyContent: "center",
-          marginBottom: "24px"
-        }}>
-          <div style={{
-            display: "inline-flex",
-            background: "#f6f6f6",
-            borderRadius: "12px",
-            padding: "4px",
-            gap: "4px"
+      <div>
+        <div style={{ fontSize: "11px", letterSpacing: "0.12em", color: "#64748b", fontWeight: "600", marginBottom: "6px" }}>
+          DECISION-MAKING ROAS
+        </div>
+        <div style={{ display: "flex", alignItems: "baseline", gap: "8px" }}>
+          <span style={{
+            fontSize: "clamp(42px, 6vw, 64px)",
+            fontWeight: "800",
+            fontFamily: "'DM Mono', monospace",
+            background: "linear-gradient(135deg, #fff 40%, #a5b4fc)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            lineHeight: 1, letterSpacing: "-0.03em"
           }}>
-            <button
-              onClick={() => setActiveView("predictions")}
-              style={{
-                padding: "12px 48px",
-                fontSize: "16px",
-                fontWeight: "700",
-                border: "none",
-                borderRadius: "10px",
-                cursor: "pointer",
-                transition: "all 0.3s ease",
-                fontFamily: "inherit",
-                background: activeView === "predictions" 
-                  ? "linear-gradient(135deg, #2bbfd5 0%, #9a17bb 100%)" 
-                  : "transparent",
-                color: activeView === "predictions" ? "#ffffff" : "#666",
-                boxShadow: activeView === "predictions" ? "0 2px 8px rgba(43, 191, 213, 0.3)" : "none"
-              }}
-            >
-              Predictions
-            </button>
-            <button
-              onClick={() => setActiveView("actuals")}
-              style={{
-                padding: "12px 48px",
-                fontSize: "16px",
-                fontWeight: "700",
-                border: "none",
-                borderRadius: "10px",
-                cursor: "pointer",
-                transition: "all 0.3s ease",
-                fontFamily: "inherit",
-                background: activeView === "actuals" 
-                  ? "linear-gradient(135deg, #2bbfd5 0%, #9a17bb 100%)" 
-                  : "transparent",
-                color: activeView === "actuals" ? "#ffffff" : "#666",
-                boxShadow: activeView === "actuals" ? "0 2px 8px rgba(43, 191, 213, 0.3)" : "none"
-              }}
-            >
-              Actuals
-            </button>
+            {animVal > 0 ? animVal.toFixed(2) : "—"}
+          </span>
+          {animVal > 0 && <span style={{ fontSize: "22px", color: "#6366f1", fontWeight: "700" }}>x</span>}
+        </div>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: "10px" }}>
+        <div style={{
+          background: decision.bg,
+          padding: "8px 20px", borderRadius: "50px",
+          fontSize: "12px", fontWeight: "800", letterSpacing: "0.1em",
+          color: "#fff", whiteSpace: "nowrap",
+          boxShadow: "0 4px 16px rgba(0,0,0,0.3)"
+        }}>{decision.label}</div>
+        <div style={{ display: "flex", gap: "6px", alignItems: "center" }}>
+          <div style={{ width: "6px", height: "6px", borderRadius: "50%", background: decision.dot }} />
+          <span style={{ fontSize: "11px", color: "#64748b", letterSpacing: "0.05em" }}>
+            {roas > 0 ? `${(roas >= 1 ? "+" : "")}${((roas - 1) * 100).toFixed(0)}% on ad spend` : "Enter data to calculate"}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StatsRow({ spend, gross, net, col }: any) {
+  const stats = [
+    { label: "Ad Spend", value: `$${fmt(spend)}`, color: "#6366f1" },
+    { label: "Gross Revenue", value: `$${fmt(gross)}`, color: "#8b5cf6" },
+    { label: "Collection Rate", value: `${(col * 100).toFixed(0)}%`, color: "#f59e0b" },
+    { label: "Net @ 90 Days", value: `$${fmt(net)}`, color: "#10b981" },
+  ];
+  return (
+    <div style={{
+      display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "10px",
+    }}>
+      {stats.map(s => (
+        <div key={s.label} style={{
+          background: "#fff",
+          border: "1.5px solid #e2e8f0",
+          borderRadius: "12px",
+          padding: "14px 16px",
+        }}>
+          <div style={{ fontSize: "10px", color: "#94a3b8", letterSpacing: "0.08em", fontWeight: "600", marginBottom: "6px" }}>
+            {s.label.toUpperCase()}
+          </div>
+          <div style={{ fontSize: "16px", fontWeight: "800", color: s.color, fontFamily: "'DM Mono', monospace", letterSpacing: "-0.02em" }}>
+            {s.value}
           </div>
         </div>
+      ))}
+    </div>
+  );
+}
 
-        {/* Calculator Card */}
+export default function ROASCalculator() {
+  const [tab, setTab] = useState("predictions");
+  const [pred, setPred] = useState({ ...EMPTY, meta: "3000", youtube: "2000", htSales: "6", htPlans: "3", mtSales: "4", mtPlans: "2", upsellUnits: "8" });
+  const [act, setAct] = useState(EMPTY);
+
+  const data = tab === "predictions" ? pred : act;
+  const setData = tab === "predictions" ? setPred : setAct;
+  const upd = (key: string) => (val: string) => setData((d: any) => ({ ...d, [key]: val }));
+
+  const { spend, gross, net, roas, col } = calcROAS(data);
+
+  return (
+    <div style={{
+      minHeight: "100vh",
+      background: "#f1f5f9",
+      fontFamily: "'DM Sans', system-ui, sans-serif",
+      padding: "24px 16px 60px",
+    }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=DM+Mono:wght@400;500;700&display=swap');
+        input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; }
+        * { box-sizing: border-box; }
+      `}</style>
+
+      {/* Page Title */}
+      <div style={{ textAlign: "center", marginBottom: "28px" }}>
+        <div style={{ fontSize: "11px", letterSpacing: "0.15em", color: "#6366f1", fontWeight: "700", marginBottom: "8px" }}>
+          90-DAY CASH ATTRIBUTION
+        </div>
+        <h1 style={{ margin: 0, fontSize: "clamp(22px, 4vw, 32px)", fontWeight: "800", color: "#0f172a", letterSpacing: "-0.03em" }}>
+          Decision-Making ROAS
+        </h1>
+      </div>
+
+      <div style={{ maxWidth: "780px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "16px" }}>
+
+        {/* ROAS Hero */}
+        <ROASBadge roas={roas} />
+
+        {/* Tab Switcher */}
         <div style={{
-          maxWidth: "1100px",
-          margin: "0 auto 32px",
-          background: "#ffffff",
-          borderRadius: "16px",
-          padding: "48px",
-          boxShadow: "0 4px 24px rgba(0,0,0,0.08)"
+          background: "#e2e8f0",
+          borderRadius: "14px",
+          padding: "4px",
+          display: "grid", gridTemplateColumns: "1fr 1fr",
         }}>
-          {activeView === "predictions" && (
-            <>
-              <div style={{ marginBottom: "32px" }}>
-                <h2 style={{ fontSize: "24px", fontWeight: "700", color: "#111314", margin: "0 0 4px 0" }}>
-                  Predictions
-                </h2>
-                <p style={{ fontSize: "13px", color: "#666", margin: 0 }}>
-                  Fill in before campaign launch
-                </p>
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "48px", marginBottom: "32px" }}>
-                {/* Left Column */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                  <div style={{ fontSize: "12px", fontWeight: "700", letterSpacing: "0.1em", color: "#3768b5", textTransform: "uppercase" }}>
-                    Ad Spend
-                  </div>
-                  <InputField label="Meta Spend" prefix="$" value={pred.meta} onChange={(v: string) => setPred({...pred, meta: v})} />
-                  <InputField label="YouTube Spend" prefix="$" value={pred.youtube} onChange={(v: string) => setPred({...pred, youtube: v})} />
-                </div>
-
-                {/* Right Column */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                  <div style={{ fontSize: "12px", fontWeight: "700", letterSpacing: "0.1em", color: "#3768b5", textTransform: "uppercase" }}>
-                    Sales
-                  </div>
-                  <InputField label="High Ticket Sales ($30k)" value={pred.htSales} onChange={(v: string) => setPred({...pred, htSales: v})} />
-                  <InputField label="High Ticket Payment Plans" value={pred.htPlans} onChange={(v: string) => setPred({...pred, htPlans: v})} />
-                  <InputField label="Mid Ticket Sales ($20k)" value={pred.mtSales} onChange={(v: string) => setPred({...pred, mtSales: v})} />
-                  <InputField label="Mid Ticket Payment Plans" value={pred.mtPlans} onChange={(v: string) => setPred({...pred, mtPlans: v})} />
-                  <InputField label="Upsell Units ($49)" value={pred.upsellUnits} onChange={(v: string) => setPred({...pred, upsellUnits: v})} />
-                </div>
-              </div>
-
-              {/* Summary + ROAS */}
-              <div style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-                gap: "20px",
-                padding: "28px 0",
-                borderTop: "2px solid #f6f6f6"
-              }}>
-                <MetricCard label="Ad Spend" value={`$${fmt(predicted.spend)}`} />
-                <MetricCard label="Gross Revenue" value={`$${fmt(predicted.gross)}`} />
-                <MetricCard label="Net @ 90d" value={`$${fmt(predicted.net)}`} highlight />
-                <MetricCard label="ROAS" value={fmtX(animatedPredROAS)} highlight color="#6366f1" />
-              </div>
-            </>
-          )}
-
-          {activeView === "actuals" && (
-            <>
-              <div style={{ marginBottom: "32px" }}>
-                <h2 style={{ fontSize: "24px", fontWeight: "700", color: "#111314", margin: "0 0 4px 0" }}>
-                  Actuals
-                </h2>
-                <p style={{ fontSize: "13px", color: "#666", margin: 0 }}>
-                  Fill in at 90 days from real data
-                </p>
-              </div>
-
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "48px", marginBottom: "32px" }}>
-                {/* Left Column */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                  <div style={{ fontSize: "12px", fontWeight: "700", letterSpacing: "0.1em", color: "#3768b5", textTransform: "uppercase" }}>
-                    Ad Spend
-                  </div>
-                  <InputField label="Meta Spend" prefix="$" value={act.meta} onChange={(v: string) => setAct({...act, meta: v})} />
-                  <InputField label="YouTube Spend" prefix="$" value={act.youtube} onChange={(v: string) => setAct({...act, youtube: v})} />
-                </div>
-
-                {/* Right Column */}
-                <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
-                  <div style={{ fontSize: "12px", fontWeight: "700", letterSpacing: "0.1em", color: "#3768b5", textTransform: "uppercase" }}>
-                    Sales
-                  </div>
-                  <InputField label="High Ticket Sales ($30k)" value={act.htSales} onChange={(v: string) => setAct({...act, htSales: v})} />
-                  <InputField label="High Ticket Payment Plans" value={act.htPlans} onChange={(v: string) => setAct({...act, htPlans: v})} />
-                  <InputField label="Mid Ticket Sales ($20k)" value={act.mtSales} onChange={(v: string) => setAct({...act, mtSales: v})} />
-                  <InputField label="Mid Ticket Payment Plans" value={act.mtPlans} onChange={(v: string) => setAct({...act, mtPlans: v})} />
-                  <InputField label="Upsell Units ($49)" value={act.upsellUnits} onChange={(v: string) => setAct({...act, upsellUnits: v})} />
-                </div>
-              </div>
-
-              {/* Summary + ROAS */}
-              <div style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-                gap: "20px",
-                padding: "28px 0",
-                borderTop: "2px solid #f6f6f6"
-              }}>
-                <MetricCard label="Ad Spend" value={`$${fmt(actual.spend)}`} />
-                <MetricCard label="Gross Revenue" value={`$${fmt(actual.gross)}`} />
-                <MetricCard label="Net @ 90d" value={`$${fmt(actual.net)}`} highlight />
-                <MetricCard label="ROAS" value={fmtX(animatedActROAS)} highlight color="#6366f1" />
-              </div>
-            </>
-          )}
+          {["predictions", "actuals"].map(t => (
+            <button key={t} onClick={() => setTab(t)} style={{
+              padding: "12px",
+              borderRadius: "11px",
+              border: "none",
+              cursor: "pointer",
+              fontSize: "14px",
+              fontWeight: "700",
+              letterSpacing: "0.01em",
+              fontFamily: "'DM Sans', sans-serif",
+              transition: "all 0.2s",
+              background: tab === t ? "#fff" : "transparent",
+              color: tab === t ? "#0f172a" : "#64748b",
+              boxShadow: tab === t ? "0 2px 8px rgba(0,0,0,0.08)" : "none",
+            }}>
+              {t === "predictions" ? "📊 Predictions" : "✅ Actuals"}
+            </button>
+          ))}
         </div>
 
-        {/* Summary Bar */}
+        {/* Main Card */}
         <div style={{
-          background: "#ffffff",
-          borderRadius: "16px",
-          padding: "32px 48px",
-          marginBottom: "32px",
-          boxShadow: "0 4px 24px rgba(0,0,0,0.08)"
+          background: "#f8fafc",
+          border: "1.5px solid #e2e8f0",
+          borderRadius: "20px",
+          padding: "24px",
+          display: "flex", flexDirection: "column", gap: "20px",
+          boxShadow: "0 4px 24px rgba(15,23,42,0.06)"
         }}>
-          <div style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            marginBottom: "24px",
-            flexWrap: "wrap",
-            gap: "16px"
-          }}>
-            <h2 style={{
-              fontSize: "24px",
-              fontWeight: "700",
-              color: "#111314",
-              margin: 0
-            }}>
-              Summary
-            </h2>
-            <div style={{
-              display: "inline-block",
-              background: "#55bdf8",
-              color: "#ffffff",
-              fontSize: "16px",
-              fontWeight: "700",
-              letterSpacing: "2px",
-              padding: "12px 32px",
-              borderRadius: "8px"
-            }}>
-              {roasLabel}
+
+          {/* Ad Spend */}
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
+              <div style={{ width: "3px", height: "18px", background: "linear-gradient(180deg, #6366f1, #8b5cf6)", borderRadius: "2px" }} />
+              <span style={{ fontSize: "12px", fontWeight: "700", letterSpacing: "0.1em", color: "#6366f1", textTransform: "uppercase" }}>Ad Spend</span>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              <InputField label="Meta Spend" prefix="$" value={data.meta} onChange={upd("meta")} />
+              <InputField label="YouTube Spend" prefix="$" value={data.youtube} onChange={upd("youtube")} />
             </div>
           </div>
 
-          <div style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-            gap: "24px"
-          }}>
-            <ComparisonMetric
-              label="ROAS"
-              predicted={fmtX(predicted.roas)}
-              actual={fmtX(actual.roas)}
-              hasActualData={actualsHasData}
-            />
-            <ComparisonMetric
-              label="Total Ad Spend"
-              predicted={`$${fmt(predicted.spend)}`}
-              actual={`$${fmt(actual.spend)}`}
-              hasActualData={actualsHasData}
-            />
-            <ComparisonMetric
-              label="Net Revenue"
-              predicted={`$${fmt(predicted.net)}`}
-              actual={`$${fmt(actual.net)}`}
-              hasActualData={actualsHasData}
-            />
-            <ComparisonMetric
-              label="Variance"
-              predicted="—"
-              actual={actualsHasData ? `${variance}%` : "—"}
-              hasActualData={actualsHasData}
-              isVariance
-            />
+          <div style={{ height: "1px", background: "#e2e8f0" }} />
+
+          {/* Sales Tiers */}
+          <div>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
+              <div style={{ width: "3px", height: "18px", background: "linear-gradient(180deg, #8b5cf6, #a855f7)", borderRadius: "2px" }} />
+              <span style={{ fontSize: "12px", fontWeight: "700", letterSpacing: "0.1em", color: "#8b5cf6", textTransform: "uppercase" }}>Sales Tiers</span>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+              <TierBlock title="High Ticket" price={30000}
+                salesVal={data.htSales} plansVal={data.htPlans}
+                onSales={upd("htSales")} onPlans={upd("htPlans")} />
+              <TierBlock title="Mid Ticket" price={20000}
+                salesVal={data.mtSales} plansVal={data.mtPlans}
+                onSales={upd("mtSales")} onPlans={upd("mtPlans")} />
+            </div>
+          </div>
+
+          <div style={{ height: "1px", background: "#e2e8f0" }} />
+
+          {/* Upsells + Collection */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
+                <div style={{ width: "3px", height: "18px", background: "linear-gradient(180deg, #10b981, #059669)", borderRadius: "2px" }} />
+                <span style={{ fontSize: "12px", fontWeight: "700", letterSpacing: "0.1em", color: "#10b981", textTransform: "uppercase" }}>Upsell</span>
+              </div>
+              <div style={{
+                background: "#fff", border: "1.5px solid #e2e8f0",
+                borderRadius: "14px", padding: "18px",
+                display: "flex", flexDirection: "column", gap: "14px"
+              }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                  <span style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a" }}>Add-on</span>
+                  <span style={{ background: "linear-gradient(135deg, #10b981, #059669)", color: "#fff", fontSize: "12px", fontWeight: "700", padding: "3px 10px", borderRadius: "20px" }}>$49</span>
+                </div>
+                <InputField label="Units Sold" value={data.upsellUnits} onChange={upd("upsellUnits")} />
+              </div>
+            </div>
+
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "14px" }}>
+                <div style={{ width: "3px", height: "18px", background: "linear-gradient(180deg, #f59e0b, #d97706)", borderRadius: "2px" }} />
+                <span style={{ fontSize: "12px", fontWeight: "700", letterSpacing: "0.1em", color: "#f59e0b", textTransform: "uppercase" }}>Collection</span>
+              </div>
+              <div style={{
+                background: "#fff", border: "1.5px solid #e2e8f0",
+                borderRadius: "14px", padding: "18px",
+                display: "flex", flexDirection: "column", gap: "14px", height: "calc(100% - 32px)"
+              }}>
+                <div>
+                  <span style={{ fontSize: "13px", fontWeight: "700", color: "#0f172a" }}>Cash Collection Rate</span>
+                  <div style={{ fontSize: "11px", color: "#94a3b8", marginTop: "3px" }}>Covers refunds, defaults & chargebacks</div>
+                </div>
+                <InputField label="Collection %" value={data.collection} onChange={upd("collection")} placeholder="95" />
+              </div>
+            </div>
           </div>
         </div>
 
-        {/* Rest of content remains the same - Educational section, etc. */}
+        {/* Stats Row */}
+        <StatsRow spend={spend} gross={gross} net={net} col={col} />
+
+        {/* Attribution note */}
         <div style={{
-          background: "#ffffff",
-          borderRadius: "16px",
-          padding: "48px",
-          boxShadow: "0 4px 24px rgba(0,0,0,0.08)"
+          background: "#fff",
+          border: "1.5px solid #e0e7ff",
+          borderRadius: "12px",
+          padding: "14px 18px",
+          display: "flex", gap: "10px", alignItems: "flex-start"
         }}>
-          <h2 style={{
-            fontSize: "28px",
-            fontWeight: "700",
-            color: "#111314",
-            marginBottom: "16px",
-            marginTop: 0
-          }}>
-            How It Works
-          </h2>
-          <p style={{
-            fontSize: "16px",
-            lineHeight: 1.7,
-            color: "#666",
-            margin: 0
-          }}>
-            This calculator helps you make data-driven ad spend decisions based on 90-day cash attribution. Payment plans are worth 25% of tier price at 90 days. High Ticket = $30k, Mid Ticket = $20k, Upsell = $49.
+          <span style={{ fontSize: "16px", flexShrink: 0 }}>📌</span>
+          <p style={{ margin: 0, fontSize: "12px", color: "#64748b", lineHeight: 1.7 }}>
+            <strong style={{ color: "#6366f1" }}>Attribution:</strong> Anyone who clicked an ad and purchased is attributed — regardless of whether they were on your list. Payment plan buyers are worth <strong>¼ of full price</strong> at 90 days.
           </p>
         </div>
       </div>
     </div>
   );
-};
-
-const MetricCard = ({ label, value, highlight, color }: any) => (
-  <div style={{
-    padding: highlight ? "16px 20px" : "12px 16px",
-    background: highlight ? "#f8fafc" : "transparent",
-    borderRadius: "10px",
-    border: highlight ? "2px solid #e2e8f0" : "none"
-  }}>
-    <div style={{
-      fontSize: "11px",
-      fontWeight: "600",
-      color: "#8892a4",
-      marginBottom: "6px",
-      textTransform: "uppercase",
-      letterSpacing: "0.08em"
-    }}>
-      {label}
-    </div>
-    <div style={{
-      fontSize: highlight ? "28px" : "20px",
-      fontWeight: "700",
-      color: color || "#0f172a",
-      fontFamily: highlight ? "'DM Mono', monospace" : "inherit"
-    }}>
-      {value}
-    </div>
-  </div>
-);
-
-const ComparisonMetric = ({ label, predicted, actual, hasActualData, isVariance }: any) => {
-  const varianceNum = parseFloat(actual.replace("%", ""));
-  const varianceColor = isVariance && hasActualData
-    ? varianceNum > 0 ? "#2bbfd5" : varianceNum < 0 ? "#9a17bb" : "#666"
-    : "#666";
-
-  return (
-    <div>
-      <div style={{
-        fontSize: "12px",
-        color: "#888",
-        marginBottom: "12px",
-        textTransform: "uppercase",
-        letterSpacing: "1px",
-        fontWeight: "600"
-      }}>
-        {label}
-      </div>
-      <div style={{ display: "flex", gap: "16px", alignItems: "baseline" }}>
-        <div>
-          <div style={{ fontSize: "11px", color: "#999", marginBottom: "2px" }}>Pred</div>
-          <div style={{ fontSize: "18px", fontWeight: "700", color: "#3768b5" }}>{predicted}</div>
-        </div>
-        <div>
-          <div style={{ fontSize: "11px", color: "#999", marginBottom: "2px" }}>Actual</div>
-          <div style={{
-            fontSize: "18px",
-            fontWeight: "700",
-            color: hasActualData ? (isVariance ? varianceColor : "#111314") : "#ccc"
-          }}>
-            {actual}
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default ROASMap;
+}
