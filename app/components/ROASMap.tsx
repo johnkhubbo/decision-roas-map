@@ -268,7 +268,7 @@ const ROASMap = () => {
         <div style={{ marginBottom: "32px" }}>
           <div style={{
             display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(400px, 1fr))",
+            gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))",
             gap: "24px"
           }}>
             {/* Predictions Column */}
@@ -513,7 +513,7 @@ const ROASMap = () => {
             textAlign: "center"
           }}>
             <div style={{ fontSize: "14px", color: "#666", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "2px" }}>
-              Scenario ROAS
+              Projected ROAS
             </div>
             <div style={{ fontSize: "48px", fontWeight: "800", color: "#111314" }}>
               {scenario.roas}x
