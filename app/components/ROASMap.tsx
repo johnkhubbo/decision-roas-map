@@ -3,20 +3,30 @@
 import { useState } from "react";
 
 const ROASMap = () => {
-  // Predictions Column
+  // Predictions Column - Prices
+  const [predHighTicketPrice, setPredHighTicketPrice] = useState(30000);
+  const [predMidTicketPrice, setPredMidTicketPrice] = useState(20000);
+  const [predUpsellPrice, setPredUpsellPrice] = useState(49);
+
+  // Predictions Column - Other
   const [predMetaSpend, setPredMetaSpend] = useState(3000);
   const [predYouTubeSpend, setPredYouTubeSpend] = useState(2000);
-  const [predSales20k, setPredSales20k] = useState(4);
-  const [predSales30k, setPredSales30k] = useState(6);
+  const [predHighTicketSales, setPredHighTicketSales] = useState(6);
+  const [predMidTicketSales, setPredMidTicketSales] = useState(4);
   const [predPaymentPlanBuyers, setPredPaymentPlanBuyers] = useState(5);
   const [predUpsellUnits, setPredUpsellUnits] = useState(8);
   const [predCashCollectionRate, setPredCashCollectionRate] = useState(95);
 
-  // Actuals Column
+  // Actuals Column - Prices
+  const [actHighTicketPrice, setActHighTicketPrice] = useState(30000);
+  const [actMidTicketPrice, setActMidTicketPrice] = useState(20000);
+  const [actUpsellPrice, setActUpsellPrice] = useState(49);
+
+  // Actuals Column - Other
   const [actMetaSpend, setActMetaSpend] = useState(0);
   const [actYouTubeSpend, setActYouTubeSpend] = useState(0);
-  const [actSales20k, setActSales20k] = useState(0);
-  const [actSales30k, setActSales30k] = useState(0);
+  const [actHighTicketSales, setActHighTicketSales] = useState(0);
+  const [actMidTicketSales, setActMidTicketSales] = useState(0);
   const [actPaymentPlanBuyers, setActPaymentPlanBuyers] = useState(0);
   const [actUpsellUnits, setActUpsellUnits] = useState(0);
   const [actCashCollectionRate, setActCashCollectionRate] = useState(95);
@@ -33,29 +43,32 @@ const ROASMap = () => {
   const calculateROAS = (
     metaSpend: number,
     youtubeSpend: number,
-    sales20k: number,
-    sales30k: number,
+    highTicketSales: number,
+    midTicketSales: number,
+    highTicketPrice: number,
+    midTicketPrice: number,
     paymentPlanBuyers: number,
     upsellUnits: number,
+    upsellPrice: number,
     cashCollectionRate: number
   ) => {
-    const totalSales = sales20k + sales30k;
+    const totalSales = highTicketSales + midTicketSales;
     if (totalSales === 0) return { roas: "0.00", netRevenue: 0, grossRevenue: 0, totalAdSpend: 0 };
 
     // Split payment plan buyers proportionally across tiers
-    const sales20kRatio = sales20k / totalSales;
-    const sales30kRatio = sales30k / totalSales;
-    const paymentPlan20k = Math.round(paymentPlanBuyers * sales20kRatio);
-    const paymentPlan30k = paymentPlanBuyers - paymentPlan20k;
+    const highTicketRatio = highTicketSales / totalSales;
+    const midTicketRatio = midTicketSales / totalSales;
+    const paymentPlanHigh = Math.round(paymentPlanBuyers * highTicketRatio);
+    const paymentPlanMid = paymentPlanBuyers - paymentPlanHigh;
 
     // Full pay buyers = total sales - payment plan buyers at each tier
-    const fullPay20k = sales20k - paymentPlan20k;
-    const fullPay30k = sales30k - paymentPlan30k;
+    const fullPayHigh = highTicketSales - paymentPlanHigh;
+    const fullPayMid = midTicketSales - paymentPlanMid;
 
     // Revenue calculations
-    const fullPayRevenue = fullPay20k * 20000 + fullPay30k * 30000;
-    const paymentPlanRevenue = paymentPlan20k * 5000 + paymentPlan30k * 7500; // 25% of tier price
-    const upsellRevenue = upsellUnits * 49;
+    const fullPayRevenue = fullPayHigh * highTicketPrice + fullPayMid * midTicketPrice;
+    const paymentPlanRevenue = paymentPlanHigh * (highTicketPrice * 0.25) + paymentPlanMid * (midTicketPrice * 0.25); // 25% of tier price
+    const upsellRevenue = upsellUnits * upsellPrice;
     const grossRevenue = fullPayRevenue + paymentPlanRevenue + upsellRevenue;
     const netRevenue = grossRevenue * (cashCollectionRate / 100);
 
@@ -68,22 +81,28 @@ const ROASMap = () => {
   const predicted = calculateROAS(
     predMetaSpend,
     predYouTubeSpend,
-    predSales20k,
-    predSales30k,
+    predHighTicketSales,
+    predMidTicketSales,
+    predHighTicketPrice,
+    predMidTicketPrice,
     predPaymentPlanBuyers,
     predUpsellUnits,
+    predUpsellPrice,
     predCashCollectionRate
   );
 
-  const actualsHasData = actMetaSpend > 0 || actYouTubeSpend > 0 || actSales20k > 0 || actSales30k > 0;
+  const actualsHasData = actMetaSpend > 0 || actYouTubeSpend > 0 || actHighTicketSales > 0 || actMidTicketSales > 0;
 
   const actual = calculateROAS(
     actMetaSpend,
     actYouTubeSpend,
-    actSales20k,
-    actSales30k,
+    actHighTicketSales,
+    actMidTicketSales,
+    actHighTicketPrice,
+    actMidTicketPrice,
     actPaymentPlanBuyers,
     actUpsellUnits,
+    actUpsellPrice,
     actCashCollectionRate
   );
 
@@ -99,26 +118,32 @@ const ROASMap = () => {
   // Scenario Planner: use actuals as baseline, fall back to predictions
   const baselineMetaSpend = actualsHasData ? actMetaSpend : predMetaSpend;
   const baselineYouTubeSpend = actualsHasData ? actYouTubeSpend : predYouTubeSpend;
-  const baselineSales20k = actualsHasData ? actSales20k : predSales20k;
-  const baselineSales30k = actualsHasData ? actSales30k : predSales30k;
+  const baselineHighTicketSales = actualsHasData ? actHighTicketSales : predHighTicketSales;
+  const baselineMidTicketSales = actualsHasData ? actMidTicketSales : predMidTicketSales;
+  const baselineHighTicketPrice = actualsHasData ? actHighTicketPrice : predHighTicketPrice;
+  const baselineMidTicketPrice = actualsHasData ? actMidTicketPrice : predMidTicketPrice;
+  const baselineUpsellPrice = actualsHasData ? actUpsellPrice : predUpsellPrice;
   const baselinePaymentPlanBuyers = actualsHasData ? actPaymentPlanBuyers : predPaymentPlanBuyers;
   const baselineUpsellUnits = actualsHasData ? actUpsellUnits : predUpsellUnits;
 
   // Scenario calculations (simplified - adjust volumes based on sliders)
   const scenarioTotalAdSpend = baselineMetaSpend + baselineYouTubeSpend;
-  const scenarioTotalSales = Math.round((baselineSales20k + baselineSales30k) * (scenarioSalesConversion / 15)); // Scale based on sales conversion
-  const scenarioSales30k = Math.round(scenarioTotalSales * (scenarioUpgradeRate / 100));
-  const scenarioSales20k = scenarioTotalSales - scenarioSales30k;
+  const scenarioTotalSales = Math.round((baselineHighTicketSales + baselineMidTicketSales) * (scenarioSalesConversion / 15)); // Scale based on sales conversion
+  const scenarioHighTicketSales = Math.round(scenarioTotalSales * (scenarioUpgradeRate / 100));
+  const scenarioMidTicketSales = scenarioTotalSales - scenarioHighTicketSales;
   const scenarioPaymentPlanBuyers = Math.round(baselinePaymentPlanBuyers * (scenarioSalesConversion / 15));
   const scenarioUpsellUnits = Math.round(scenarioTotalSales * (scenarioUpsellRate / 100));
 
   const scenario = calculateROAS(
     baselineMetaSpend,
     baselineYouTubeSpend,
-    scenarioSales20k,
-    scenarioSales30k,
+    scenarioHighTicketSales,
+    scenarioMidTicketSales,
+    baselineHighTicketPrice,
+    baselineMidTicketPrice,
     scenarioPaymentPlanBuyers,
     scenarioUpsellUnits,
+    baselineUpsellPrice,
     scenarioCashCollection
   );
 
@@ -174,10 +199,16 @@ const ROASMap = () => {
               setMetaSpend={setPredMetaSpend}
               youtubeSpend={predYouTubeSpend}
               setYouTubeSpend={setPredYouTubeSpend}
-              sales20k={predSales20k}
-              setSales20k={setPredSales20k}
-              sales30k={predSales30k}
-              setSales30k={setPredSales30k}
+              highTicketPrice={predHighTicketPrice}
+              setHighTicketPrice={setPredHighTicketPrice}
+              midTicketPrice={predMidTicketPrice}
+              setMidTicketPrice={setPredMidTicketPrice}
+              upsellPrice={predUpsellPrice}
+              setUpsellPrice={setPredUpsellPrice}
+              highTicketSales={predHighTicketSales}
+              setHighTicketSales={setPredHighTicketSales}
+              midTicketSales={predMidTicketSales}
+              setMidTicketSales={setPredMidTicketSales}
               paymentPlanBuyers={predPaymentPlanBuyers}
               setPaymentPlanBuyers={setPredPaymentPlanBuyers}
               upsellUnits={predUpsellUnits}
@@ -199,10 +230,16 @@ const ROASMap = () => {
               setMetaSpend={setActMetaSpend}
               youtubeSpend={actYouTubeSpend}
               setYouTubeSpend={setActYouTubeSpend}
-              sales20k={actSales20k}
-              setSales20k={setActSales20k}
-              sales30k={actSales30k}
-              setSales30k={setActSales30k}
+              highTicketPrice={actHighTicketPrice}
+              setHighTicketPrice={setActHighTicketPrice}
+              midTicketPrice={actMidTicketPrice}
+              setMidTicketPrice={setActMidTicketPrice}
+              upsellPrice={actUpsellPrice}
+              setUpsellPrice={setActUpsellPrice}
+              highTicketSales={actHighTicketSales}
+              setHighTicketSales={setActHighTicketSales}
+              midTicketSales={actMidTicketSales}
+              setMidTicketSales={setActMidTicketSales}
               paymentPlanBuyers={actPaymentPlanBuyers}
               setPaymentPlanBuyers={setActPaymentPlanBuyers}
               upsellUnits={actUpsellUnits}
@@ -573,10 +610,16 @@ const CalculatorColumn = ({
   setMetaSpend,
   youtubeSpend,
   setYouTubeSpend,
-  sales20k,
-  setSales20k,
-  sales30k,
-  setSales30k,
+  highTicketPrice,
+  setHighTicketPrice,
+  midTicketPrice,
+  setMidTicketPrice,
+  upsellPrice,
+  setUpsellPrice,
+  highTicketSales,
+  setHighTicketSales,
+  midTicketSales,
+  setMidTicketSales,
   paymentPlanBuyers,
   setPaymentPlanBuyers,
   upsellUnits,
@@ -623,12 +666,31 @@ const CalculatorColumn = ({
       <NumberInput label="YouTube spend ($)" value={youtubeSpend} onChange={setYouTubeSpend} />
 
       <SectionLabel label="Sales" />
-      <NumberInput label="Sales at $20,000 tier" value={sales20k} onChange={setSales20k} />
-      <NumberInput label="Sales at $30,000 tier" value={sales30k} onChange={setSales30k} />
+      <ProductInput 
+        label="High Ticket" 
+        price={highTicketPrice} 
+        setPrice={setHighTicketPrice}
+        sales={highTicketSales}
+        setSales={setHighTicketSales}
+      />
+      <ProductInput 
+        label="Mid Ticket" 
+        price={midTicketPrice} 
+        setPrice={setMidTicketPrice}
+        sales={midTicketSales}
+        setSales={setMidTicketSales}
+      />
       <NumberInput label="Buyers on payment plans (total count)" value={paymentPlanBuyers} onChange={setPaymentPlanBuyers} />
 
-      <SectionLabel label="Upsells" />
-      <NumberInput label="Upsell units sold ($49 each)" value={upsellUnits} onChange={setUpsellUnits} />
+      <SectionLabel label="Upsell" />
+      <ProductInput 
+        label="Upsell" 
+        price={upsellPrice} 
+        setPrice={setUpsellPrice}
+        sales={upsellUnits}
+        setSales={setUpsellUnits}
+        salesLabel="Units sold"
+      />
 
       <SectionLabel label="Cash Collection" />
       <NumberInput label="Cash Collection Rate (%)" value={cashCollectionRate} onChange={setCashCollectionRate} max={100} />
@@ -747,6 +809,62 @@ const NumberInput = ({ label, value, onChange, max }: any) => (
       onFocus={(e) => e.target.style.borderColor = "#55bdf8"}
       onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
     />
+  </div>
+);
+
+const ProductInput = ({ label, price, setPrice, sales, setSales, salesLabel = "Sales" }: any) => (
+  <div>
+    <label style={{
+      display: "block",
+      fontSize: "13px",
+      color: "#666",
+      marginBottom: "6px"
+    }}>
+      {label}
+    </label>
+    <div style={{ display: "flex", gap: "8px", alignItems: "center" }}>
+      <div style={{ flex: "0 0 auto", width: "120px" }}>
+        <input
+          type="number"
+          value={price}
+          onChange={e => setPrice(parseFloat(e.target.value) || 0)}
+          min={0}
+          placeholder="Price"
+          style={{
+            width: "100%",
+            padding: "10px 8px",
+            fontSize: "12px",
+            border: "1px solid #e0e0e0",
+            borderRadius: "8px",
+            fontFamily: "inherit",
+            outline: "none",
+            color: "#666"
+          }}
+          onFocus={(e) => e.target.style.borderColor = "#55bdf8"}
+          onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
+        />
+      </div>
+      <div style={{ flex: 1 }}>
+        <input
+          type="number"
+          value={sales}
+          onChange={e => setSales(parseFloat(e.target.value) || 0)}
+          min={0}
+          placeholder={salesLabel}
+          style={{
+            width: "100%",
+            padding: "10px 12px",
+            fontSize: "16px",
+            border: "1px solid #e0e0e0",
+            borderRadius: "8px",
+            fontFamily: "inherit",
+            outline: "none"
+          }}
+          onFocus={(e) => e.target.style.borderColor = "#55bdf8"}
+          onBlur={(e) => e.target.style.borderColor = "#e0e0e0"}
+        />
+      </div>
+    </div>
   </div>
 );
 
