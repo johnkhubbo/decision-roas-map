@@ -12,8 +12,9 @@ const ROASMap = () => {
   const [predMetaSpend, setPredMetaSpend] = useState(3000);
   const [predYouTubeSpend, setPredYouTubeSpend] = useState(2000);
   const [predHighTicketSales, setPredHighTicketSales] = useState(6);
+  const [predHighTicketPaymentPlans, setPredHighTicketPaymentPlans] = useState(3);
   const [predMidTicketSales, setPredMidTicketSales] = useState(4);
-  const [predPaymentPlanBuyers, setPredPaymentPlanBuyers] = useState(5);
+  const [predMidTicketPaymentPlans, setPredMidTicketPaymentPlans] = useState(2);
   const [predUpsellUnits, setPredUpsellUnits] = useState(8);
   const [predCashCollectionRate, setPredCashCollectionRate] = useState(95);
 
@@ -26,8 +27,9 @@ const ROASMap = () => {
   const [actMetaSpend, setActMetaSpend] = useState(0);
   const [actYouTubeSpend, setActYouTubeSpend] = useState(0);
   const [actHighTicketSales, setActHighTicketSales] = useState(0);
+  const [actHighTicketPaymentPlans, setActHighTicketPaymentPlans] = useState(0);
   const [actMidTicketSales, setActMidTicketSales] = useState(0);
-  const [actPaymentPlanBuyers, setActPaymentPlanBuyers] = useState(0);
+  const [actMidTicketPaymentPlans, setActMidTicketPaymentPlans] = useState(0);
   const [actUpsellUnits, setActUpsellUnits] = useState(0);
   const [actCashCollectionRate, setActCashCollectionRate] = useState(95);
 
@@ -44,10 +46,11 @@ const ROASMap = () => {
     metaSpend: number,
     youtubeSpend: number,
     highTicketSales: number,
+    highTicketPaymentPlans: number,
     midTicketSales: number,
+    midTicketPaymentPlans: number,
     highTicketPrice: number,
     midTicketPrice: number,
-    paymentPlanBuyers: number,
     upsellUnits: number,
     upsellPrice: number,
     cashCollectionRate: number
@@ -55,19 +58,13 @@ const ROASMap = () => {
     const totalSales = highTicketSales + midTicketSales;
     if (totalSales === 0) return { roas: "0.00", netRevenue: 0, grossRevenue: 0, totalAdSpend: 0 };
 
-    // Split payment plan buyers proportionally across tiers
-    const highTicketRatio = highTicketSales / totalSales;
-    const midTicketRatio = midTicketSales / totalSales;
-    const paymentPlanHigh = Math.round(paymentPlanBuyers * highTicketRatio);
-    const paymentPlanMid = paymentPlanBuyers - paymentPlanHigh;
-
     // Full pay buyers = total sales - payment plan buyers at each tier
-    const fullPayHigh = highTicketSales - paymentPlanHigh;
-    const fullPayMid = midTicketSales - paymentPlanMid;
+    const fullPayHigh = highTicketSales - highTicketPaymentPlans;
+    const fullPayMid = midTicketSales - midTicketPaymentPlans;
 
     // Revenue calculations
     const fullPayRevenue = fullPayHigh * highTicketPrice + fullPayMid * midTicketPrice;
-    const paymentPlanRevenue = paymentPlanHigh * (highTicketPrice * 0.25) + paymentPlanMid * (midTicketPrice * 0.25); // 25% of tier price
+    const paymentPlanRevenue = highTicketPaymentPlans * (highTicketPrice * 0.25) + midTicketPaymentPlans * (midTicketPrice * 0.25); // 25% of tier price
     const upsellRevenue = upsellUnits * upsellPrice;
     const grossRevenue = fullPayRevenue + paymentPlanRevenue + upsellRevenue;
     const netRevenue = grossRevenue * (cashCollectionRate / 100);
@@ -82,10 +79,11 @@ const ROASMap = () => {
     predMetaSpend,
     predYouTubeSpend,
     predHighTicketSales,
+    predHighTicketPaymentPlans,
     predMidTicketSales,
+    predMidTicketPaymentPlans,
     predHighTicketPrice,
     predMidTicketPrice,
-    predPaymentPlanBuyers,
     predUpsellUnits,
     predUpsellPrice,
     predCashCollectionRate
@@ -97,10 +95,11 @@ const ROASMap = () => {
     actMetaSpend,
     actYouTubeSpend,
     actHighTicketSales,
+    actHighTicketPaymentPlans,
     actMidTicketSales,
+    actMidTicketPaymentPlans,
     actHighTicketPrice,
     actMidTicketPrice,
-    actPaymentPlanBuyers,
     actUpsellUnits,
     actUpsellPrice,
     actCashCollectionRate
@@ -119,11 +118,12 @@ const ROASMap = () => {
   const baselineMetaSpend = actualsHasData ? actMetaSpend : predMetaSpend;
   const baselineYouTubeSpend = actualsHasData ? actYouTubeSpend : predYouTubeSpend;
   const baselineHighTicketSales = actualsHasData ? actHighTicketSales : predHighTicketSales;
+  const baselineHighTicketPaymentPlans = actualsHasData ? actHighTicketPaymentPlans : predHighTicketPaymentPlans;
   const baselineMidTicketSales = actualsHasData ? actMidTicketSales : predMidTicketSales;
+  const baselineMidTicketPaymentPlans = actualsHasData ? actMidTicketPaymentPlans : predMidTicketPaymentPlans;
   const baselineHighTicketPrice = actualsHasData ? actHighTicketPrice : predHighTicketPrice;
   const baselineMidTicketPrice = actualsHasData ? actMidTicketPrice : predMidTicketPrice;
   const baselineUpsellPrice = actualsHasData ? actUpsellPrice : predUpsellPrice;
-  const baselinePaymentPlanBuyers = actualsHasData ? actPaymentPlanBuyers : predPaymentPlanBuyers;
   const baselineUpsellUnits = actualsHasData ? actUpsellUnits : predUpsellUnits;
 
   // Scenario calculations (simplified - adjust volumes based on sliders)
@@ -131,17 +131,19 @@ const ROASMap = () => {
   const scenarioTotalSales = Math.round((baselineHighTicketSales + baselineMidTicketSales) * (scenarioSalesConversion / 15)); // Scale based on sales conversion
   const scenarioHighTicketSales = Math.round(scenarioTotalSales * (scenarioUpgradeRate / 100));
   const scenarioMidTicketSales = scenarioTotalSales - scenarioHighTicketSales;
-  const scenarioPaymentPlanBuyers = Math.round(baselinePaymentPlanBuyers * (scenarioSalesConversion / 15));
+  const scenarioHighTicketPaymentPlans = Math.round(baselineHighTicketPaymentPlans * (scenarioSalesConversion / 15));
+  const scenarioMidTicketPaymentPlans = Math.round(baselineMidTicketPaymentPlans * (scenarioSalesConversion / 15));
   const scenarioUpsellUnits = Math.round(scenarioTotalSales * (scenarioUpsellRate / 100));
 
   const scenario = calculateROAS(
     baselineMetaSpend,
     baselineYouTubeSpend,
     scenarioHighTicketSales,
+    scenarioHighTicketPaymentPlans,
     scenarioMidTicketSales,
+    scenarioMidTicketPaymentPlans,
     baselineHighTicketPrice,
     baselineMidTicketPrice,
-    scenarioPaymentPlanBuyers,
     scenarioUpsellUnits,
     baselineUpsellPrice,
     scenarioCashCollection
@@ -207,10 +209,12 @@ const ROASMap = () => {
               setUpsellPrice={setPredUpsellPrice}
               highTicketSales={predHighTicketSales}
               setHighTicketSales={setPredHighTicketSales}
+              highTicketPaymentPlans={predHighTicketPaymentPlans}
+              setHighTicketPaymentPlans={setPredHighTicketPaymentPlans}
               midTicketSales={predMidTicketSales}
               setMidTicketSales={setPredMidTicketSales}
-              paymentPlanBuyers={predPaymentPlanBuyers}
-              setPaymentPlanBuyers={setPredPaymentPlanBuyers}
+              midTicketPaymentPlans={predMidTicketPaymentPlans}
+              setMidTicketPaymentPlans={setPredMidTicketPaymentPlans}
               upsellUnits={predUpsellUnits}
               setUpsellUnits={setPredUpsellUnits}
               cashCollectionRate={predCashCollectionRate}
@@ -238,10 +242,12 @@ const ROASMap = () => {
               setUpsellPrice={setActUpsellPrice}
               highTicketSales={actHighTicketSales}
               setHighTicketSales={setActHighTicketSales}
+              highTicketPaymentPlans={actHighTicketPaymentPlans}
+              setHighTicketPaymentPlans={setActHighTicketPaymentPlans}
               midTicketSales={actMidTicketSales}
               setMidTicketSales={setActMidTicketSales}
-              paymentPlanBuyers={actPaymentPlanBuyers}
-              setPaymentPlanBuyers={setActPaymentPlanBuyers}
+              midTicketPaymentPlans={actMidTicketPaymentPlans}
+              setMidTicketPaymentPlans={setActMidTicketPaymentPlans}
               upsellUnits={actUpsellUnits}
               setUpsellUnits={setActUpsellUnits}
               cashCollectionRate={actCashCollectionRate}
@@ -618,10 +624,12 @@ const CalculatorColumn = ({
   setUpsellPrice,
   highTicketSales,
   setHighTicketSales,
+  highTicketPaymentPlans,
+  setHighTicketPaymentPlans,
   midTicketSales,
   setMidTicketSales,
-  paymentPlanBuyers,
-  setPaymentPlanBuyers,
+  midTicketPaymentPlans,
+  setMidTicketPaymentPlans,
   upsellUnits,
   setUpsellUnits,
   cashCollectionRate,
@@ -673,6 +681,8 @@ const CalculatorColumn = ({
         sales={highTicketSales}
         setSales={setHighTicketSales}
         salesLabel="Sales"
+        paymentPlans={highTicketPaymentPlans}
+        setPaymentPlans={setHighTicketPaymentPlans}
       />
       <ProductInput 
         label="Mid Ticket" 
@@ -681,8 +691,9 @@ const CalculatorColumn = ({
         sales={midTicketSales}
         setSales={setMidTicketSales}
         salesLabel="Sales"
+        paymentPlans={midTicketPaymentPlans}
+        setPaymentPlans={setMidTicketPaymentPlans}
       />
-      <NumberInput label="Buyers on payment plans (total count)" value={paymentPlanBuyers} onChange={setPaymentPlanBuyers} />
 
       <SectionLabel label="Upsell" />
       <ProductInput 
@@ -814,7 +825,7 @@ const NumberInput = ({ label, value, onChange, max }: any) => (
   </div>
 );
 
-const ProductInput = ({ label, price, setPrice, sales, setSales, salesLabel = "Units sold" }: any) => (
+const ProductInput = ({ label, price, setPrice, sales, setSales, salesLabel = "Units sold", paymentPlans, setPaymentPlans }: any) => (
   <div>
     <label style={{
       display: "block",
@@ -824,7 +835,7 @@ const ProductInput = ({ label, price, setPrice, sales, setSales, salesLabel = "U
     }}>
       {label}
     </label>
-    <div style={{ display: "flex", gap: "8px", alignItems: "flex-start" }}>
+    <div style={{ display: "flex", gap: "8px", alignItems: "flex-start", marginBottom: paymentPlans !== undefined ? "8px" : "0" }}>
       <div style={{ flex: "0 0 auto", width: "120px" }}>
         <div style={{
           fontSize: "11px",
@@ -894,6 +905,15 @@ const ProductInput = ({ label, price, setPrice, sales, setSales, salesLabel = "U
         />
       </div>
     </div>
+    {paymentPlans !== undefined && (
+      <div style={{ paddingLeft: "128px" }}>
+        <NumberInput 
+          label="Payment plans" 
+          value={paymentPlans} 
+          onChange={setPaymentPlans}
+        />
+      </div>
+    )}
   </div>
 );
 
