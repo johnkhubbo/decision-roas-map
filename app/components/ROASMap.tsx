@@ -6,15 +6,18 @@ const ROASMap = () => {
   const [fullPay, setFullPay] = useState(22000);
   const [paymentPlanPct, setPaymentPlanPct] = useState(50);
   const [refundRate, setRefundRate] = useState(3);
+  const [defaultRate, setDefaultRate] = useState(5);
   const [adSpend, setAdSpend] = useState(5000);
   const [sales, setSales] = useState(10);
 
   const planValue = fullPay * 0.25;
   const fullPaySales = sales * (1 - paymentPlanPct / 100);
   const planSales = sales * (paymentPlanPct / 100);
-  const grossCash = fullPaySales * fullPay + planSales * planValue;
+  const planCash = planSales * planValue;
+  const grossCash = fullPaySales * fullPay + planCash;
+  const defaultDeduction = planCash * (defaultRate / 100);
   const refundDeduction = grossCash * (refundRate / 100);
-  const netCash = grossCash - refundDeduction;
+  const netCash = grossCash - defaultDeduction - refundDeduction;
   const roas = adSpend > 0 ? (netCash / adSpend).toFixed(2) : "0.00";
   const roasNum = parseFloat(roas);
 
@@ -115,15 +118,14 @@ const ROASMap = () => {
           </div>
           <div style={{ display: "flex", gap: "24px", flexWrap: "wrap", alignItems: "center" }}>
             <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+              <span style={{ fontSize: "20px" }}>⚠️</span>
+              <span style={{ color: "#ff4d6d", fontWeight: "bold" }}>Defaults</span>
+              <span style={{ color: "#aaa", fontSize: "13px" }}>— payment plan buyers who stop paying</span>
+            </div>
+            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
               <span style={{ fontSize: "20px" }}>↩️</span>
               <span style={{ color: "#ff4d6d", fontWeight: "bold" }}>Refunds</span>
               <span style={{ color: "#aaa", fontSize: "13px" }}>— typical 2–3% off gross</span>
-            </div>
-            <div style={{
-              fontSize: "13px", color: "#888",
-              borderLeft: "1px solid #333", paddingLeft: "16px"
-            }}>
-              Only on sales attributed to ad traffic
             </div>
           </div>
         </div>
@@ -204,6 +206,8 @@ const ROASMap = () => {
               onChange={setFullPay} color="#ffd60a" format={v => `$${v.toLocaleString()}`} />
             <Slider label="Payment Plan %" value={paymentPlanPct} min={0} max={100} step={5}
               onChange={setPaymentPlanPct} color="#c77dff" format={v => `${v}%`} />
+            <Slider label="Plan Default Rate %" value={defaultRate} min={0} max={20} step={0.5}
+              onChange={setDefaultRate} color="#ff9500" format={v => `${v}%`} />
             <Slider label="Refund Rate %" value={refundRate} min={0} max={10} step={0.5}
               onChange={setRefundRate} color="#ff4d6d" format={v => `${v}%`} />
             <Slider label="Ad Spend ($)" value={adSpend} min={100} max={50000} step={100}
@@ -220,6 +224,7 @@ const ROASMap = () => {
             gap: "16px"
           }}>
             <SummaryItem label="Gross Cash" value={`$${grossCash.toLocaleString("en", { maximumFractionDigits: 0 })}`} />
+            <SummaryItem label="Default Deduction" value={`−$${defaultDeduction.toLocaleString("en", { maximumFractionDigits: 0 })}`} color="#ff9500" />
             <SummaryItem label="Refund Deduction" value={`−$${refundDeduction.toLocaleString("en", { maximumFractionDigits: 0 })}`} color="#ff4d6d" />
             <SummaryItem label="Net Cash @ 90d" value={`$${netCash.toLocaleString("en", { maximumFractionDigits: 0 })}`} color="#ffd60a" />
             <SummaryItem label="Decision ROAS" value={`${roas}x`} color={roasColor} big />
@@ -238,7 +243,7 @@ const ROASMap = () => {
           <div style={{ fontSize: "13px", color: "#aaa", lineHeight: 1.7 }}>
             <strong style={{ color: "#4cc9f0" }}>Attribution Rule:</strong> Anyone who <em>clicked on an ad</em> and purchased is attributed — 
             regardless of whether they were already on your list. Cash collected from those people at 90 days 
-            (less refunds) is your Decision-Making ROAS. Use 120–180 days only if you have access to capital.
+            (less defaults and refunds) is your Decision-Making ROAS. Use 120–180 days only if you have access to capital.
           </div>
         </div>
       </div>
