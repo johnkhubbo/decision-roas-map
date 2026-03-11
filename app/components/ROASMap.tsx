@@ -132,7 +132,7 @@ const ROASMap = () => {
       {/* Header */}
       <div style={{
         background: "linear-gradient(135deg, #2bbfd5 0%, #9a17bb 100%)",
-        padding: "60px 24px",
+        padding: "60px 24px 80px",
         textAlign: "center"
       }}>
         <h1 style={{
@@ -146,124 +146,19 @@ const ROASMap = () => {
         </h1>
         <p style={{
           fontSize: "18px",
-          color: "rgba(255,255,255,0.9)",
-          maxWidth: "600px",
+          color: "rgba(255,255,255,0.95)",
+          maxWidth: "700px",
           margin: "0 auto",
-          fontWeight: "400"
+          fontWeight: "400",
+          lineHeight: 1.6
         }}>
-          Make data-driven ad spend decisions based on 90-day cash attribution
+          Track predicted vs actual performance at 90 days, then model what-if scenarios to optimize your funnel.
         </p>
       </div>
 
       {/* Main Content */}
-      <div style={{ maxWidth: "1400px", margin: "-40px auto 0", padding: "0 24px 60px" }}>
+      <div style={{ maxWidth: "1400px", margin: "-60px auto 0", padding: "0 24px 60px" }}>
         
-        {/* How It Works Section */}
-        <div style={{
-          background: "#ffffff",
-          borderRadius: "16px",
-          padding: "48px",
-          marginBottom: "32px",
-          boxShadow: "0 4px 24px rgba(0,0,0,0.08)"
-        }}>
-          <h2 style={{
-            fontSize: "28px",
-            fontWeight: "700",
-            color: "#111314",
-            marginBottom: "32px",
-            marginTop: 0
-          }}>
-            How It Works
-          </h2>
-
-          {/* The 3 Inputs */}
-          <div style={{ marginBottom: "48px" }}>
-            <h3 style={{
-              fontSize: "20px",
-              fontWeight: "600",
-              color: "#3768b5",
-              marginBottom: "24px"
-            }}>
-              The 3 Revenue Inputs
-            </h3>
-            <div style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
-              gap: "24px"
-            }}>
-              <InfoBox
-                icon="💰"
-                title="Full Pays"
-                description="Customers who paid the full price upfront"
-                color="#3768b5"
-              />
-              <InfoBox
-                icon="📅"
-                title="Payment Plans"
-                description="Worth ¼ of full price at 90 days"
-                color="#55bdf8"
-              />
-              <InfoBox
-                icon="🖱️"
-                title="Ad Clickers"
-                description="Anyone who clicked an ad — list or not"
-                color="#2bbfd5"
-              />
-            </div>
-          </div>
-
-          {/* The 90-Day Rule */}
-          <div style={{ marginBottom: "48px" }}>
-            <h3 style={{
-              fontSize: "20px",
-              fontWeight: "600",
-              color: "#3768b5",
-              marginBottom: "16px"
-            }}>
-              The 90-Day Rule
-            </h3>
-            <div style={{
-              background: "#f6f6f6",
-              padding: "24px",
-              borderRadius: "12px",
-              borderLeft: "4px solid #55bdf8"
-            }}>
-              <p style={{
-                fontSize: "16px",
-                lineHeight: 1.7,
-                color: "#111314",
-                margin: 0
-              }}>
-                Collect cash at <strong style={{ color: "#3768b5" }}>90 days</strong> — the attribution window for decision-making. 
-                This is real cash-in-hand, not future projections. You can extend to 120–180 days if you have access to capital.
-              </p>
-            </div>
-          </div>
-
-          {/* The Formula */}
-          <div style={{
-            background: "linear-gradient(135deg, #2bbfd5 0%, #9a17bb 100%)",
-            padding: "32px",
-            borderRadius: "12px",
-            textAlign: "center"
-          }}>
-            <div style={{
-              fontSize: "clamp(16px, 3vw, 20px)",
-              color: "#ffffff",
-              lineHeight: 1.8,
-              fontWeight: "500"
-            }}>
-              <strong style={{ fontSize: "clamp(18px, 3.5vw, 24px)" }}>Decision-Making ROAS</strong>
-              <br />
-              = Net Revenue @ 90 Days ÷ Total Ad Spend
-              <br />
-              <span style={{ fontSize: "clamp(14px, 2.5vw, 18px)", opacity: 0.9 }}>
-                (Payment plans worth 25% • Cash collection applied to gross)
-              </span>
-            </div>
-          </div>
-        </div>
-
         {/* Predictions & Actuals Section */}
         <div style={{ marginBottom: "32px" }}>
           <div style={{
@@ -358,7 +253,8 @@ const ROASMap = () => {
           <div style={{
             display: "grid",
             gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
-            gap: "24px"
+            gap: "24px",
+            marginBottom: "24px"
           }}>
             <ComparisonMetric
               label="ROAS"
@@ -387,11 +283,42 @@ const ROASMap = () => {
             />
           </div>
 
+          {/* How is ROAS Calculated? */}
+          <div style={{
+            background: "#f6f6f6",
+            padding: "20px 24px",
+            borderRadius: "12px",
+            borderLeft: "4px solid #55bdf8"
+          }}>
+            <h3 style={{
+              fontSize: "16px",
+              fontWeight: "700",
+              color: "#3768b5",
+              marginBottom: "12px",
+              marginTop: 0
+            }}>
+              💡 How is ROAS Calculated?
+            </h3>
+            <div style={{
+              fontSize: "14px",
+              lineHeight: 1.7,
+              color: "#666"
+            }}>
+              <strong style={{ color: "#111314" }}>Net Revenue @ 90 Days</strong> = (Full Pay Revenue + Payment Plan Revenue + Upsell Revenue) × Cash Collection Rate
+              <br />
+              <strong style={{ color: "#111314" }}>ROAS</strong> = Net Revenue ÷ Total Ad Spend
+              <br />
+              <span style={{ fontSize: "13px", color: "#888" }}>
+                • Payment plans worth 25% of tier price at 90 days • Payment plan buyers split proportionally across tiers
+              </span>
+            </div>
+          </div>
+
           {actualsHasData && (
             <div style={{
               marginTop: "24px",
               paddingTop: "24px",
-              borderTop: "1px solid #f6f6f6",
+              borderTop: "1px solid #e0e0e0",
               display: "flex",
               gap: "32px",
               flexWrap: "wrap"
@@ -417,6 +344,7 @@ const ROASMap = () => {
           background: "#ffffff",
           borderRadius: "16px",
           padding: "48px",
+          marginBottom: "32px",
           boxShadow: "0 4px 24px rgba(0,0,0,0.08)"
         }}>
           <div style={{ marginBottom: "32px" }}>
@@ -520,6 +448,109 @@ const ROASMap = () => {
             </div>
             <div style={{ fontSize: "16px", color: "#666", marginTop: "8px" }}>
               Net Revenue: ${Math.round(scenario.netRevenue).toLocaleString()}
+            </div>
+          </div>
+        </div>
+
+        {/* Educational Content - Moved to Bottom */}
+        <div style={{
+          background: "#ffffff",
+          borderRadius: "16px",
+          padding: "48px",
+          boxShadow: "0 4px 24px rgba(0,0,0,0.08)"
+        }}>
+          <h2 style={{
+            fontSize: "28px",
+            fontWeight: "700",
+            color: "#111314",
+            marginBottom: "32px",
+            marginTop: 0
+          }}>
+            How It Works
+          </h2>
+
+          {/* The 3 Inputs */}
+          <div style={{ marginBottom: "48px" }}>
+            <h3 style={{
+              fontSize: "20px",
+              fontWeight: "600",
+              color: "#3768b5",
+              marginBottom: "24px"
+            }}>
+              The 3 Revenue Inputs
+            </h3>
+            <div style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
+              gap: "24px"
+            }}>
+              <InfoBox
+                icon="💰"
+                title="Full Pays"
+                description="Customers who paid the full price upfront"
+                color="#3768b5"
+              />
+              <InfoBox
+                icon="📅"
+                title="Payment Plans"
+                description="Worth ¼ of full price at 90 days"
+                color="#55bdf8"
+              />
+              <InfoBox
+                icon="🖱️"
+                title="Ad Clickers"
+                description="Anyone who clicked an ad — list or not"
+                color="#2bbfd5"
+              />
+            </div>
+          </div>
+
+          {/* The 90-Day Rule */}
+          <div style={{ marginBottom: "48px" }}>
+            <h3 style={{
+              fontSize: "20px",
+              fontWeight: "600",
+              color: "#3768b5",
+              marginBottom: "16px"
+            }}>
+              The 90-Day Rule
+            </h3>
+            <div style={{
+              background: "#f6f6f6",
+              padding: "24px",
+              borderRadius: "12px",
+              borderLeft: "4px solid #55bdf8"
+            }}>
+              <p style={{
+                fontSize: "16px",
+                lineHeight: 1.7,
+                color: "#111314",
+                margin: 0
+              }}>
+                Collect cash at <strong style={{ color: "#3768b5" }}>90 days</strong> — the attribution window for decision-making. 
+                This is real cash-in-hand, not future projections. You can extend to 120–180 days if you have access to capital.
+              </p>
+            </div>
+          </div>
+
+          {/* Attribution Rule */}
+          <div style={{
+            background: "#f6f6f6",
+            padding: "24px",
+            borderRadius: "12px",
+            borderLeft: "4px solid #2bbfd5"
+          }}>
+            <div style={{
+              display: "flex",
+              gap: "16px",
+              alignItems: "flex-start"
+            }}>
+              <span style={{ fontSize: "24px", flexShrink: 0 }}>📌</span>
+              <div style={{ fontSize: "15px", lineHeight: 1.7, color: "#111314" }}>
+                <strong style={{ color: "#3768b5" }}>Attribution Rule:</strong> Anyone who <em>clicked on an ad</em> and 
+                purchased is attributed — regardless of whether they were already on your list. Cash collected from those 
+                people at 90 days (less defaults and refunds) is your Decision-Making ROAS.
+              </div>
             </div>
           </div>
         </div>
